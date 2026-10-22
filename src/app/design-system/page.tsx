@@ -23,6 +23,7 @@ import {
   TableCell,
 } from "@/components/ui/Table";
 import { Ticket } from "@/components/ui/Ticket";
+import { ConcertTicketCard } from "@/components/ui/ConcertTicketCard";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { formatXAF, generateTicketCode } from "@/lib/utils";
 import {
@@ -535,23 +536,43 @@ export default function DesignSystemPage() {
           </div>
         </div>
 
-        {/* COMPOSANT DU BILLET EN SITUATION RÉELLE */}
-        <Ticket
-          ticketCode={testTicketCode}
-          eventName="GODMAN AFRO-FUSION NIGHT"
-          category="VIP"
-          price={25000}
-          eventDate={new Date("2026-11-28T20:30:00")}
-          location="Palais des Congrès"
-          city="Brazzaville"
-          buyerName="Aimé Césaire Kouka"
-          buyerPhone="+242 06 612 34 56"
-          status={ticketStatus}
-          gate="Porte A - Accès VIP"
-          onShareWhatsApp={() => {
-            alert(`Lien WhatsApp simulé pour le billet ${testTicketCode}`);
-          }}
-        />
+        {/* DUAL TICKETS DISPLAY: CONCERT PASS (VOICE STAGE STYLE) + BOARDING PASS */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center pt-6">
+          <div className="lg:col-span-1 flex flex-col items-center justify-center p-6 rounded-2xl bg-slate-100/70 border border-slate-200">
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-900 mb-4 block font-mono">
+              ★ Format Pass Concert 3D (Éditorial)
+            </span>
+            <ConcertTicketCard
+              eventName="GODMAN LIVE PASS"
+              category="VIP ALL-ACCESS"
+              price="25 000 FCFA"
+              ticketCode={testTicketCode}
+              rotate="-rotate-3"
+            />
+          </div>
+
+          <div className="lg:col-span-2 space-y-4">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-700 block font-mono">
+              ★ Format Billet Nominatif (Fiche d'accès)
+            </span>
+            <Ticket
+              ticketCode={testTicketCode}
+              eventName="GODMAN AFRO-FUSION NIGHT"
+              category="VIP"
+              price={25000}
+              eventDate={new Date("2026-11-28T20:30:00")}
+              location="Palais des Congrès"
+              city="Brazzaville"
+              buyerName="Aimé Césaire Kouka"
+              buyerPhone="+242 06 612 34 56"
+              status={ticketStatus}
+              gate="Porte A - Accès VIP"
+              onShareWhatsApp={() => {
+                alert(`Lien WhatsApp simulé pour le billet ${testTicketCode}`);
+              }}
+            />
+          </div>
+        </div>
       </section>
 
       {/* PIED DE PAGE DESIGN SYSTEM */}
