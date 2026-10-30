@@ -1,0 +1,1 @@
+const fs = require("fs"); const path = require("path"); const [,, fp, b64] = process.argv; if (!fp || !b64) { console.error("Missing args"); process.exit(1); } const dir = path.dirname(fp); if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(fp, Buffer.from(b64, "base64")); console.log("WROTE: " + fp);
