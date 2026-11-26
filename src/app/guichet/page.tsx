@@ -7,7 +7,8 @@ import {
   User, Phone, Banknote, Plus, Minus, Search, RefreshCw,
   Shield
 } from "lucide-react";
-import { MOCK_EVENTS } from "@/lib/store/events";
+import { getEventsByCategory } from "@/lib/store/events";
+import { useStoreVersion } from "@/lib/store/subscribe";
 import { addOrder } from "@/lib/store/orders";
 import { createOrderFromPurchase, buildWhatsAppMessage, formatWhatsAppUrl } from "@/lib/ticket-engine";
 import { formatXAF } from "@/lib/utils";
@@ -16,6 +17,7 @@ import type { EventItem, TicketType, PaymentMethod, Order } from "@/lib/types";
 type Step = "select_event" | "select_type" | "buyer_info" | "payment" | "confirm";
 
 export default function GuichetPage() {
+  useStoreVersion();
   const [step, setStep] = useState<Step>("select_event");
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
   const [selectedType, setSelectedType] = useState<TicketType | null>(null);
@@ -32,7 +34,7 @@ export default function GuichetPage() {
     startTime.current = Date.now();
   }, []);
 
-  const filteredEvents = MOCK_EVENTS.filter(e =>
+  const filteredEvents = getEventsByCategory("Tous").filter(e =>
     e.status === "published" &&
     (e.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       e.venue.toLowerCase().includes(searchQuery.toLowerCase()))

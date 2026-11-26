@@ -61,6 +61,18 @@ Accéder à l'application :
 
 ---
 
+## 🗄️ Connexion Supabase
+
+1. Crée un projet sur [supabase.com](https://supabase.com).
+2. Dans **SQL Editor**, exécute le contenu de `supabase/schema.sql`.
+3. Copie `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY` depuis **Project Settings → API**.
+4. Ajoute ces deux variables dans `.env.local` et dans **Vercel → Settings → Environment Variables**.
+5. Redéploie. Au premier chargement, les événements de démonstration sont insérés automatiquement dans Supabase.
+
+> `SUPABASE_SERVICE_ROLE_KEY` reste côté serveur uniquement (jamais exposé au navigateur).
+
+---
+
 ## 🎨 Composants du Design System (Étape 1)
 
 Le projet intègre une bibliothèque complète de composants personnalisés :

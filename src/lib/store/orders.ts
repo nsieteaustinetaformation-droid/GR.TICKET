@@ -1,10 +1,19 @@
-import type { Order, Ticket } from '@/lib/types';
+import type { Order } from '@/lib/types';
+import { persistOrder } from '@/lib/supabase/write';
+import { notifyStoreChange } from './subscribe';
 
-// Client-side in-memory store (replaces Supabase in Etape 2 backend)
+// Local mirror of the Supabase "orders" table.
 let _orders: Order[] = [];
+
+export function setOrders(orders: Order[]): void {
+  _orders = orders;
+  notifyStoreChange();
+}
 
 export function addOrder(order: Order): void {
   _orders = [order, ..._orders];
+  notifyStoreChange();
+  void persistOrder(order);
 }
 
 export function getAllOrders(): Order[] {

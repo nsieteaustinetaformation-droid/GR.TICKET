@@ -8,11 +8,13 @@ import {
 } from "lucide-react";
 import { getAllOrders, getTotalRevenue, getTotalTicketsSold, getRevenueByPaymentMethod } from "@/lib/store/orders";
 import { getAllScans, getSuccessfulScans } from "@/lib/store/scans";
-import { MOCK_EVENTS } from "@/lib/store/events";
+import { getEventsByCategory } from "@/lib/store/events";
+import { useStoreVersion } from "@/lib/store/subscribe";
 import { formatXAF } from "@/lib/utils";
 import type { Order, ScanRecord } from "@/lib/types";
 
 export default function DashboardPage() {
+  useStoreVersion();
   const [orders, setOrders] = useState<Order[]>([]);
   const [scans, setScans] = useState<ScanRecord[]>([]);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
@@ -32,7 +34,8 @@ export default function DashboardPage() {
     { mtn: 0, airtel: 0, cash: 0 } as Record<string, number>
   );
   const totalScans = scans.filter(s => s.result === "SUCCESS").length;
-  const totalEvents = MOCK_EVENTS.filter(e => e.status === "published").length;
+  const publishedEvents = getEventsByCategory("Tous");
+  const totalEvents = publishedEvents.length;
 
   const statCards = [
     { label: "Chiffre d Affaires", value: formatXAF(totalRevenue), icon: DollarSign, color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20" },
@@ -41,7 +44,7 @@ export default function DashboardPage() {
     { label: "Evenements Actifs", value: totalEvents.toString(), icon: Calendar, color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/20" },
   ];
 
-  const eventStats = MOCK_EVENTS.filter(e => e.status === "published").map(ev => {
+  const eventStats = publishedEvents.map(ev => {
     const evOrders = orders.filter(o => o.eventId === ev.id && o.paymentStatus === "completed");
     const evRevenue = evOrders.reduce((s, o) => s + o.totalAmount, 0);
     const evTickets = evOrders.reduce((s, o) => s + o.ticketCount, 0);

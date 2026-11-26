@@ -8,7 +8,8 @@ import {
 import { isValidTicketCode } from "@/lib/ticket-engine";
 import { addScanRecord, getAllScans, getSuccessfulScans } from "@/lib/store/scans";
 import { getAllOrders } from "@/lib/store/orders";
-import { MOCK_EVENTS } from "@/lib/store/events";
+import { getEventsByCategory } from "@/lib/store/events";
+import { useStoreVersion } from "@/lib/store/subscribe";
 import { formatXAF } from "@/lib/utils";
 import type { ScanRecord } from "@/lib/types";
 
@@ -22,7 +23,8 @@ const RESULT_CONFIG = {
 };
 
 export default function ScannerPage() {
-  const [selectedEventId, setSelectedEventId] = useState(MOCK_EVENTS[0]?.id ?? "");
+  useStoreVersion();
+  const [selectedEventId, setSelectedEventId] = useState(getEventsByCategory("Tous")[0]?.id ?? "");
   const [scanResult, setScanResult] = useState<ScanResult>("idle");
   const [lastScan, setLastScan] = useState<ScanRecord | null>(null);
   const [manualCode, setManualCode] = useState("");
@@ -46,7 +48,7 @@ export default function ScannerPage() {
   const processCode = useCallback((code: string) => {
     if (!code.trim()) return;
     const normalized = code.trim().toUpperCase();
-    const event = MOCK_EVENTS.find(e => e.id === selectedEventId);
+    const event = getEventsByCategory("Tous").find(e => e.id === selectedEventId);
     if (!event) return;
 
     const allOrders = getAllOrders();
@@ -106,7 +108,7 @@ export default function ScannerPage() {
     setTimeout(() => inputRef.current?.focus(), 100);
   }
 
-  const selectedEvent = MOCK_EVENTS.find(e => e.id === selectedEventId);
+  const selectedEvent = getEventsByCategory("Tous").find(e => e.id === selectedEventId);
   const eventScans = getSuccessfulScans(selectedEventId);
   const totalCapacity = selectedEvent?.ticketTypes.reduce((s, t) => s + t.totalQuantity, 0) ?? 0;
   const enterPct = totalCapacity > 0 ? Math.round((eventScans.length / totalCapacity) * 100) : 0;
@@ -154,7 +156,7 @@ export default function ScannerPage() {
           <select
             value={selectedEventId} onChange={e => { setSelectedEventId(e.target.value); handleReset(); }}
             className="w-full bg-[#120B24] border border-[#251846] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500 transition-colors">
-            {MOCK_EVENTS.filter(e => e.status === "published").map(ev => (
+            {getEventsByCategory("Tous").filter(e => e.status === "published").map(ev => (
               <option key={ev.id} value={ev.id}>{ev.title} — {ev.date}</option>
             ))}
           </select>

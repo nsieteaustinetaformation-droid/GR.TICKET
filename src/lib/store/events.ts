@@ -1,4 +1,12 @@
 import type { EventItem, TicketType } from '@/lib/types';
+import { notifyStoreChange } from './subscribe';
+
+let currentEvents: EventItem[] = [];
+
+export function setEvents(events: EventItem[]): void {
+  currentEvents = events;
+  notifyStoreChange();
+}
 
 const DEFAULT_TYPES = (eventId: string): TicketType[] => [
   { id: eventId + '-std', eventId, name: 'Standard', price: 15000, totalQuantity: 500, soldQuantity: 187, benefits: ['Acces General'] },
@@ -74,17 +82,21 @@ export const MOCK_EVENTS: EventItem[] = [
   },
 ];
 
+function allEvents(): EventItem[] {
+  return currentEvents.length > 0 ? currentEvents : MOCK_EVENTS;
+}
+
 export function getEventById(id: string): EventItem | undefined {
-  return MOCK_EVENTS.find(e => e.id === id);
+  return allEvents().find(e => e.id === id);
 }
 
 export function getFeaturedEvents(): EventItem[] {
-  return MOCK_EVENTS.filter(e => e.featured && e.status === 'published');
+  return allEvents().filter(e => e.featured && e.status === 'published');
 }
 
 export function getEventsByCategory(cat: string): EventItem[] {
-  if (cat === 'Tous') return MOCK_EVENTS.filter(e => e.status === 'published');
-  return MOCK_EVENTS.filter(e => e.category === cat && e.status === 'published');
+  if (cat === 'Tous') return allEvents().filter(e => e.status === 'published');
+  return allEvents().filter(e => e.category === cat && e.status === 'published');
 }
 
 export function getEventCapacityPercent(event: EventItem): number {

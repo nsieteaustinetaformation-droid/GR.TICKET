@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { ConcertTicketCard } from "@/components/ui/ConcertTicketCard";
 import { formatXAF, generateTicketCode } from "@/lib/utils";
+import { getEventsByCategory } from "@/lib/store/events";
+import { useStoreVersion } from "@/lib/store/subscribe";
 import {
   Mic2,
   Calendar,
@@ -31,6 +33,7 @@ import {
 } from "lucide-react";
 
 export default function Home() {
+  useStoreVersion();
   const [selectedCategory, setSelectedCategory] = useState<string>("Tous");
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<{
@@ -57,74 +60,23 @@ export default function Home() {
     amount: number;
   } | null>(null);
 
-  // LISTE DES ÉVÉNEMENTS CONGO-BRAZZAVILLE
-  const eventsList: Array<Omit<EventCardProps, "onSelect">> = [
-    {
-      id: "ev-1",
-      title: "Godman Afro-Fusion Festival 2026",
-      category: "Festival",
-      imageUrl: "/images/ticket_bg.jpg",
-      venue: "Palais des Congrès",
-      city: "Brazzaville",
-      date: "28 Nov 2026 • 20h30",
-      price: 15000,
-    },
-    {
-      id: "ev-2",
-      title: "Fally Ipupa & Guests Live",
-      category: "Concert",
-      imageUrl: "/images/concert_guitarist.jpg",
-      venue: "Stade Alphonse Massamba-Débat",
-      city: "Brazzaville",
-      date: "15 Janv 2027 • 19h00",
-      price: 10000,
-    },
-    {
-      id: "ev-3",
-      title: "Nuit de la Rumba Congolaise",
-      category: "VIP Pass",
-      imageUrl: "/images/artist_hero.jpg",
-      venue: "Hôtel Atlantic Palace",
-      city: "Pointe-Noire",
-      date: "05 Déc 2026 • 21h00",
-      price: 25000,
-    },
-    {
-      id: "ev-4",
-      title: "Festival Panafricain FESPAM",
-      category: "Festival",
-      imageUrl: "/images/festival_stadium.jpg",
-      venue: "Esplanade CNRTV",
-      city: "Brazzaville",
-      date: "20 Fév 2027 • 18h00",
-      price: 20000,
-    },
-    {
-      id: "ev-5",
-      title: "Gospel & Soul Celebration Live",
-      category: "Concert",
-      imageUrl: "/images/ticket_bg.jpg",
-      venue: "Centre Culturel Russe",
-      city: "Brazzaville",
-      date: "12 Déc 2026 • 17h30",
-      price: 5000,
-    },
-    {
-      id: "ev-6",
-      title: "Godman All-Stars New Year Showcase",
-      category: "VIP Pass",
-      imageUrl: "/images/concert_guitarist.jpg",
-      venue: "Club 64 VIP Lounge",
-      city: "Brazzaville",
-      date: "31 Déc 2026 • 22h00",
-      price: 30000,
-    },
-  ];
+  // Événements chargés depuis Supabase (repli sur les données de démonstration si non configuré).
+  const eventsList: Array<Omit<EventCardProps, "onSelect">> = getEventsByCategory(
+    selectedCategory
+  ).map((event) => ({
+    id: event.id,
+    title: event.title,
+    category: event.category as EventCardProps["category"],
+    imageUrl: event.imageUrl,
+    venue: event.venue,
+    city: event.city,
+    date: `${event.date} • ${event.startTime}`,
+    price: event.ticketTypes.length
+      ? Math.min(...event.ticketTypes.map((type) => type.price))
+      : 0,
+  }));
 
-  const filteredEvents =
-    selectedCategory === "Tous"
-      ? eventsList
-      : eventsList.filter((e) => e.category === selectedCategory);
+  const filteredEvents = eventsList;
 
   const openCheckoutForEvent = (event: {
     title: string;
