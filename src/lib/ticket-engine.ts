@@ -16,10 +16,17 @@ export function isValidTicketCode(code: string): boolean {
   return /^GR-[0-9A-HJKMNP-TV-Z]{5}-[0-9A-HJKMNP-TV-Z]{5}$/.test(code.toUpperCase().trim());
 }
 
+function toBase64Utf8(value: string): string {
+  const bytes = new TextEncoder().encode(value);
+  let binary = '';
+  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+  return btoa(binary);
+}
+
 export function generateQrToken(ticketId: string, eventId: string, code: string): string {
   // Lightweight token for offline QR (without real HMAC on client)
   // Real HMAC-SHA256 is generated server-side (Etape 4 route handler)
-  const payload = btoa(JSON.stringify({ id: ticketId, ev: eventId, code, ts: Date.now() }));
+  const payload = toBase64Utf8(JSON.stringify({ id: ticketId, ev: eventId, code, ts: Date.now() }));
   return 'GR.' + payload;
 }
 

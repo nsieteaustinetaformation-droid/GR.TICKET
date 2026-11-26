@@ -560,7 +560,7 @@ export default function DesignSystemPage() {
               eventName="GODMAN AFRO-FUSION NIGHT"
               category="VIP"
               price={25000}
-              eventDate={new Date("2026-11-28T20:30:00")}
+              eventDate="2026-11-28T20:30:00+01:00"
               location="Palais des Congrès"
               city="Brazzaville"
               buyerName="Aimé Césaire Kouka"

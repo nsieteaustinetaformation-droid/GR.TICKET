@@ -8,9 +8,13 @@ import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { ConcertTicketCard } from "@/components/ui/ConcertTicketCard";
-import { formatXAF, generateTicketCode } from "@/lib/utils";
+import { formatXAF } from "@/lib/utils";
 import { getEventsByCategory } from "@/lib/store/events";
+import { addOrder, getAllOrders } from "@/lib/store/orders";
+import { getSuccessfulScans } from "@/lib/store/scans";
 import { useStoreVersion } from "@/lib/store/subscribe";
+import { createOrderFromPurchase } from "@/lib/ticket-engine";
+import type { EventItem, PaymentMethod } from "@/lib/types";
 import {
   Mic2,
   Calendar,
@@ -36,17 +40,7 @@ export default function Home() {
   useStoreVersion();
   const [selectedCategory, setSelectedCategory] = useState<string>("Tous");
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<{
-    title: string;
-    venue: string;
-    price: number;
-    category: string;
-  }>({
-    title: "Godman Afro-Fusion Festival 2026",
-    venue: "Palais des Congrès, Brazzaville",
-    price: 15000,
-    category: "Festival",
-  });
+  const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
 
   const [buyerName, setBuyerName] = useState("");
   const [buyerPhone, setBuyerPhone] = useState("+242 06 ");
@@ -77,26 +71,48 @@ export default function Home() {
   }));
 
   const filteredEvents = eventsList;
+  const publishedEvents = getEventsByCategory("Tous");
+  const defaultEvent = publishedEvents[0];
 
-  const openCheckoutForEvent = (event: {
-    title: string;
-    venue: string;
-    price: number;
-    category: string;
-  }) => {
+  const completedOrders = getAllOrders().filter((o) => o.paymentStatus === "completed");
+  const ticketsSold = completedOrders.reduce((total, o) => total + o.ticketCount, 0);
+  const validatedEntries = getSuccessfulScans().length;
+  const selectedPrice = selectedEvent?.ticketTypes.length
+    ? Math.min(...selectedEvent.ticketTypes.map((type) => type.price))
+    : 0;
+
+  const openCheckoutForEvent = (event: EventItem) => {
     setSelectedEvent(event);
     setIsPurchased(false);
     setIsCheckoutOpen(true);
   };
 
+  const openDefaultCheckout = () => {
+    if (defaultEvent) openCheckoutForEvent(defaultEvent);
+  };
+
   const handleBuy = (e: React.FormEvent) => {
     e.preventDefault();
-    const code = generateTicketCode();
+    if (!selectedEvent || selectedEvent.ticketTypes.length === 0) return;
+
+    const cheapestType = [...selectedEvent.ticketTypes].sort((a, b) => a.price - b.price)[0];
+    const order = createOrderFromPurchase({
+      event: selectedEvent,
+      ticketType: cheapestType,
+      buyerName: buyerName.trim(),
+      buyerPhone: buyerPhone.trim(),
+      paymentMethod: paymentMethod as PaymentMethod,
+      quantity: ticketQuantity,
+    });
+
+    // L'achat est enregistré (Supabase si configuré, sinon mémoire) pour que
+    // le scanner et le tableau de bord voient immédiatement les billets.
+    addOrder(order);
     setGeneratedTicket({
-      code,
-      name: buyerName || "Merveil Makosso",
-      phone: buyerPhone || "+242 06 123 45 67",
-      amount: selectedEvent.price * ticketQuantity,
+      code: order.tickets.map((ticket) => ticket.code).join(" · "),
+      name: order.buyerName,
+      phone: order.buyerPhone,
+      amount: order.totalAmount,
     });
     setIsPurchased(true);
   };
@@ -104,7 +120,7 @@ export default function Home() {
   const shareWhatsApp = () => {
     if (!generatedTicket) return;
     const msg = encodeURIComponent(
-      `🎉 *BILLET OFFICIEL GODMAN RECORDS TIKET* 🎉\n\nÉvénement : ${selectedEvent.title}\nLieu : ${selectedEvent.venue}\nTitulaire : ${generatedTicket.name}\nCode : ${generatedTicket.code}\nTarif payé : ${formatXAF(generatedTicket.amount)}\nMode : ${paymentMethod.toUpperCase()} Mobile Money\n\nConservez ce message, il servira au contrôle d'entrée !`
+      `🎉 *BILLET OFFICIEL GODMAN RECORDS TIKET* 🎉\n\nÉvénement : ${selectedEvent?.title ?? ""}\nLieu : ${selectedEvent?.venue ?? ""}\nTitulaire : ${generatedTicket.name}\nCode : ${generatedTicket.code}\nTarif payé : ${formatXAF(generatedTicket.amount)}\nMode : ${paymentMethod.toUpperCase()} Mobile Money\n\nConservez ce message, il servira au contrôle d'entrée !`
     );
     window.open(
       `https://wa.me/${generatedTicket.phone.replace(/[^0-9]/g, "")}?text=${msg}`,
@@ -152,26 +168,23 @@ export default function Home() {
           {/* ACTIONS RAPIDES (SEARCH, CART, PROFILE) */}
           <div className="flex items-center gap-3">
             <button
-              onClick={() => openCheckoutForEvent(eventsList[0])}
+              onClick={() => document.getElementById("events")?.scrollIntoView({ behavior: "smooth" })}
               className="p-2.5 rounded-full bg-white/5 border border-white/10 text-[#A59EBF] hover:text-white hover:border-purple-500/40 transition-colors"
-              aria-label="Recherche rapide"
+              aria-label="Voir les événements"
             >
               <Search className="w-4 h-4" />
             </button>
 
-            <button
-              onClick={() => openCheckoutForEvent(eventsList[0])}
-              className="p-2.5 rounded-full bg-white/5 border border-white/10 text-[#A59EBF] hover:text-white hover:border-purple-500/40 transition-colors relative"
-              aria-label="Panier"
+            <Link
+              href="/guichet"
+              className="p-2.5 rounded-full bg-white/5 border border-white/10 text-[#A59EBF] hover:text-white hover:border-purple-500/40 transition-colors inline-flex"
+              aria-label="Guichet Express"
             >
               <ShoppingCart className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-purple-600 text-[9px] font-bold flex items-center justify-center text-white">
-                1
-              </span>
-            </button>
+            </Link>
 
             <button
-              onClick={() => openCheckoutForEvent(eventsList[0])}
+              onClick={openDefaultCheckout}
               className="btn-neon-purple px-5 py-2.5 text-xs font-bold uppercase tracking-wider hidden sm:flex items-center gap-2 cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
@@ -226,20 +239,20 @@ export default function Home() {
                 <ArrowRight className="w-4 h-4" />
               </a>
 
-              <button
-                onClick={() => openCheckoutForEvent(eventsList[0])}
+              <Link
+                href="/guichet"
                 className="btn-glass-outline px-7 py-3.5 text-sm font-semibold uppercase tracking-wider flex items-center gap-2 cursor-pointer"
               >
                 <User className="w-4 h-4 text-purple-400" />
                 <span>Guichet Rapide</span>
-              </button>
+              </Link>
             </div>
 
             {/* COMPTEUR DE STATISTIQUES */}
             <div className="pt-12 grid grid-cols-3 gap-6 max-w-lg mx-auto border-t border-white/10 mt-10">
               <div>
                 <span className="font-heading font-black text-2xl sm:text-3xl text-white block">
-                  50+
+                  {publishedEvents.length}
                 </span>
                 <span className="text-[11px] text-[#A59EBF] uppercase font-medium mt-1 block">
                   Événements
@@ -248,7 +261,7 @@ export default function Home() {
 
               <div>
                 <span className="font-heading font-black text-2xl sm:text-3xl text-purple-400 block">
-                  50K+
+                  {ticketsSold.toLocaleString("fr-FR")}
                 </span>
                 <span className="text-[11px] text-[#A59EBF] uppercase font-medium mt-1 block">
                   Billets Vendus
@@ -257,7 +270,7 @@ export default function Home() {
 
               <div>
                 <span className="font-heading font-black text-2xl sm:text-3xl text-white block">
-                  99%
+                  {validatedEntries}
                 </span>
                 <span className="text-[11px] text-[#A59EBF] uppercase font-medium mt-1 block">
                   Entrées Validées
@@ -407,7 +420,10 @@ export default function Home() {
             <EventCard
               key={evt.id}
               {...evt}
-              onSelect={() => openCheckoutForEvent(evt)}
+              onSelect={() => {
+                const fullEvent = publishedEvents.find((event) => event.id === evt.id);
+                if (fullEvent) openCheckoutForEvent(fullEvent);
+              }}
             />
           ))}
         </div>
@@ -434,10 +450,13 @@ export default function Home() {
 
           <div className="pt-2">
             <button
-              onClick={() => openCheckoutForEvent(eventsList[0])}
+              onClick={() => {
+                setSelectedCategory("VIP Pass");
+                document.getElementById("events")?.scrollIntoView({ behavior: "smooth" });
+              }}
               className="btn-neon-purple px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-wider inline-flex items-center gap-2 cursor-pointer"
             >
-              <span>En Savoir Plus Sur Le Pass VIP</span>
+              <span>Voir les Pass VIP</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -466,19 +485,19 @@ export default function Home() {
             <div className="p-4 rounded-2xl bg-[#090514] border border-[#251846] flex items-center justify-between text-left">
               <div>
                 <span className="text-[10px] uppercase font-mono tracking-wider text-purple-400 block font-bold">
-                  {selectedEvent.category}
+                  {selectedEvent?.category}
                 </span>
                 <p className="font-heading text-lg font-bold text-white tracking-wide">
-                  {selectedEvent.title}
+                  {selectedEvent?.title}
                 </p>
                 <span className="text-xs text-[#A59EBF]">
-                  {selectedEvent.venue}
+                  {selectedEvent?.venue}
                 </span>
               </div>
               <div className="text-right">
                 <span className="text-[10px] uppercase text-[#6E6589] block">Prix unitaire</span>
                 <span className="font-heading text-2xl font-black text-white font-tabular">
-                  {formatXAF(selectedEvent.price)}
+                  {formatXAF(selectedPrice)}
                 </span>
               </div>
             </div>
@@ -563,7 +582,7 @@ export default function Home() {
               <div>
                 <span className="text-[10px] uppercase text-[#6E6589] block">Total net à payer</span>
                 <span className="font-heading text-2xl font-black text-white font-tabular">
-                  {formatXAF(selectedEvent.price * ticketQuantity)}
+                  {formatXAF(selectedPrice * ticketQuantity)}
                 </span>
               </div>
 
@@ -598,7 +617,7 @@ export default function Home() {
             <div className="p-4 rounded-2xl bg-[#090514] text-white border border-purple-500/40 text-left space-y-2">
               <div className="flex justify-between items-center text-xs">
                 <span className="text-purple-300 font-bold uppercase tracking-wider">
-                  {selectedEvent.title}
+                  {selectedEvent?.title}
                 </span>
                 <Badge variant="success">Valide</Badge>
               </div>
