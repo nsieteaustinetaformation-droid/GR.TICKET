@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-[#080412] px-4 text-center text-white">
-      <h1 className="text-2xl font-black uppercase tracking-tight">Godman Tikets</h1>
+      <h1 className="text-2xl font-black uppercase tracking-tight">GRTK</h1>
       <p className="mt-2 text-sm text-white/60">Votre espace organisateur vous attend.</p>
       <Link
         href="/dashboard"

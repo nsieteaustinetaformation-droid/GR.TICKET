@@ -41,6 +41,10 @@ export function getEventById(id: string): EventItem | undefined {
   return currentEvents.find(e => e.id === id);
 }
 
+export function getEventBySlug(slug: string): EventItem | undefined {
+  return currentEvents.find(e => e.slug === slug);
+}
+
 export function getFeaturedEvents(): EventItem[] {
   return currentEvents.filter(e => e.featured && e.status === 'published');
 }

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Ticket as TicketIcon, ArrowRight } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { DEFAULT_COMMISSION_PERCENT } from "@/lib/domain/constants";
 
 type Mode = "login" | "signup";
 
@@ -13,7 +14,7 @@ export default function ConnexionPage() {
   const { signIn, signUp, isDemo, user } = useAuth();
   const [mode, setMode] = useState<Mode>("login");
   const [fullName, setFullName] = useState("");
-  const [phone, setPhone] = useState("+242 ");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -49,9 +50,9 @@ export default function ConnexionPage() {
             <TicketIcon className="w-5 h-5 text-purple-200" />
           </div>
           <div>
-            <p className="font-black uppercase tracking-tight">Godman Tikets</p>
+            <p className="font-black uppercase tracking-tight">GRTK</p>
             <p className="text-[10px] font-mono uppercase tracking-widest text-white/40">
-              Congo-Brazzaville
+              Billetterie internationale
             </p>
           </div>
         </div>
@@ -85,7 +86,7 @@ export default function ConnexionPage() {
             <p className="text-xs text-white/50 mt-1">
               {mode === "login"
                 ? "Connectez-vous pour gérer vos événements et vos ventes."
-                : "Créez vos événements, vendez des billets. La plateforme prélève 10 % sur chaque vente."}
+                : `Créez vos événements, vendez des billets. La plateforme prélève ${DEFAULT_COMMISSION_PERCENT} % sur chaque vente.`}
             </p>
           </div>
 
@@ -100,11 +101,11 @@ export default function ConnexionPage() {
               <>
                 <label className="block space-y-1.5">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Nom complet</span>
-                  <input className={field} value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ex: Dieudonné Ondongo" required />
+                  <input className={field} value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ex: Alice Martin" required />
                 </label>
                 <label className="block space-y-1.5">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Téléphone WhatsApp (+242)</span>
-                  <input className={field} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+242 06 123 45 67" />
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Téléphone WhatsApp (indicatif international)</span>
+                  <input className={field} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Ex: +33 6 12 34 56 78 (selon votre pays)" />
                 </label>
               </>
             )}

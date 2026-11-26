@@ -7,7 +7,10 @@ import { ArrowLeft, ArrowRight, Plus, Trash2 } from "lucide-react";
 import { RequireAuth } from "@/components/system/RequireAuth";
 import { WizardSteps } from "@/components/system/WizardSteps";
 import { loadDraft, saveDraft, type EventDraft, type TicketTypeDraft } from "@/lib/draft";
-import { formatXAF } from "@/lib/utils";
+import { DEFAULT_COMMISSION_PERCENT } from "@/lib/domain/constants";
+import { formatMoney, toMinor } from "@/lib/international/money";
+import { getCountryConfig } from "@/lib/international/config";
+import "@/lib/international/seed";
 
 const field =
   "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:border-purple-400";
@@ -53,7 +56,10 @@ function BilletsWizard() {
     router.push("/evenements/nouveau/commission");
   };
 
-  const gross = draft.ticketTypes.reduce((sum, t) => sum + t.price * t.quantity, 0);
+  const config = getCountryConfig(draft.countryCode);
+  const currency = draft.currency || config.currency;
+  const money = (amountMinor: number) => formatMoney(amountMinor, currency, config.locale);
+  const gross = draft.ticketTypes.reduce((sum, t) => sum + toMinor(t.price, currency) * t.quantity, 0);
 
   return (
     <main className="min-h-screen bg-[#080412] text-white px-4 py-10">
@@ -82,7 +88,7 @@ function BilletsWizard() {
                   <input className={field} value={t.name} onChange={(e) => updateTicket(t.id, { name: e.target.value })} placeholder="Standard, VIP…" required />
                 </label>
                 <label className="block space-y-1.5">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Prix (FCFA)</span>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Prix ({currency})</span>
                   <input type="number" min={1} className={field} value={t.price} onChange={(e) => updateTicket(t.id, { price: Number(e.target.value) })} required />
                 </label>
                 <label className="block space-y-1.5">
@@ -91,7 +97,7 @@ function BilletsWizard() {
                 </label>
               </div>
               <p className="text-[11px] text-white/40">
-                Revenu potentiel : {formatXAF(t.price * t.quantity)} — vous recevrez {formatXAF(Math.round(t.price * t.quantity * 0.9))} après la commission de 10 %.
+                Revenu potentiel : {money(toMinor(t.price, currency) * t.quantity)} — vous recevrez {money(Math.round(toMinor(t.price, currency) * t.quantity * (100 - DEFAULT_COMMISSION_PERCENT) / 100))} après la commission de {DEFAULT_COMMISSION_PERCENT} %.
               </p>
             </div>
           ))}
@@ -102,7 +108,7 @@ function BilletsWizard() {
 
           <div className="rounded-2xl border border-purple-400/20 bg-purple-500/10 p-4 flex items-center justify-between text-sm">
             <span className="text-white/60">Chiffre d&apos;affaires potentiel</span>
-            <span className="font-black text-lg">{formatXAF(gross)}</span>
+            <span className="font-black text-lg">{money(gross)}</span>
           </div>
 
           {error && <p className="text-xs text-red-300">{error}</p>}

@@ -15,7 +15,10 @@ export interface EventDraft {
   startTime: string;
   doorsOpenTime: string;
   venue: string;
-  city: "Brazzaville" | "Pointe-Noire" | "Dolisie" | "Oyo" | "";
+  city: string;
+  countryCode: string;
+  currency: string;
+  timeZone: string;
   address: string;
   imageUrl: string;
   ticketTypes: TicketTypeDraft[];
@@ -36,10 +39,13 @@ export function emptyDraft(): EventDraft {
     doorsOpenTime: "",
     venue: "",
     city: "",
+    countryCode: "",
+    currency: "",
+    timeZone: "",
     address: "",
     imageUrl: "/images/ticket_bg.jpg",
-    ticketTypes: [{ id: crypto.randomUUID(), name: "Standard", price: 10000, quantity: 100 }],
-    payoutMethod: "mtn",
+    ticketTypes: [{ id: crypto.randomUUID(), name: "Standard", price: 0, quantity: 10 }],
+    payoutMethod: "card",
     payoutPhone: "",
     accepted: false,
   };
@@ -69,12 +75,12 @@ export function clearDraft(): void {
   if (typeof window !== "undefined") window.localStorage.removeItem(DRAFT_KEY);
 }
 
-export function formatDraftDate(iso: string): string {
+export function formatDraftDate(iso: string, timeZone = "UTC", locale = "fr"): string {
   if (!iso) return "";
-  return new Intl.DateTimeFormat("fr-FR", {
-    timeZone: "Africa/Brazzaville",
+  return new Intl.DateTimeFormat(locale === "fr" ? "fr-FR" : "en-US", {
+    timeZone,
     day: "2-digit",
     month: "short",
     year: "numeric",
-  }).format(new Date(`${iso}T12:00:00+01:00`));
+  }).format(new Date(`${iso}T12:00:00Z`));
 }

@@ -3,7 +3,9 @@
 import React from "react";
 import Image from "next/image";
 import { Calendar, MapPin, Ticket as TicketIcon } from "lucide-react";
-import { formatXAF } from "@/lib/utils";
+import { getCountryConfig } from "@/lib/international/config";
+import "@/lib/international/seed";
+import { formatMoney, toMinor } from "@/lib/international/money";
 
 export interface EventCardProps {
   id: string;
@@ -14,6 +16,9 @@ export interface EventCardProps {
   city?: string;
   date: string;
   price: number;
+  countryCode?: string;
+  currency?: string;
+  locale?: string;
   availableTickets?: number;
   onSelect: () => void;
 }
@@ -23,12 +28,18 @@ export function EventCard({
   category,
   imageUrl,
   venue,
-  city = "Brazzaville",
+  city = "",
   date,
   price,
+  countryCode,
+  currency,
+  locale,
   availableTickets = 150,
   onSelect,
 }: EventCardProps) {
+  const config = getCountryConfig(countryCode);
+  const resolvedCurrency = currency ?? config.currency;
+  const resolvedLocale = locale ?? config.locale;
   const badgeColors = {
     Concert: "bg-purple-600/80 text-purple-100 border border-purple-400/40",
     Festival: "bg-pink-600/80 text-pink-100 border border-pink-400/40",
@@ -84,7 +95,7 @@ export function EventCard({
               À partir de
             </span>
             <span className="font-heading font-black text-lg text-white font-tabular">
-              {formatXAF(price)}
+              {formatMoney(toMinor(price, resolvedCurrency, resolvedLocale), resolvedCurrency, resolvedLocale)}
             </span>
           </div>
 

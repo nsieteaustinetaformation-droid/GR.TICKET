@@ -10,7 +10,6 @@ import { addScanRecord, getAllScans, getSuccessfulScans } from "@/lib/store/scan
 import { getAllOrders } from "@/lib/store/orders";
 import { getEventsByCategory } from "@/lib/store/events";
 import { useStoreVersion } from "@/lib/store/subscribe";
-import { formatXAF } from "@/lib/utils";
 import type { ScanRecord } from "@/lib/types";
 import { RequireAuth } from "@/components/system/RequireAuth";
 

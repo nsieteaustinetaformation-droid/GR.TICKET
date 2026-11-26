@@ -8,9 +8,13 @@ import { RequireAuth } from "@/components/system/RequireAuth";
 import { WizardSteps } from "@/components/system/WizardSteps";
 import { useAuth } from "@/lib/auth";
 import { clearDraft, formatDraftDate, loadDraft, type EventDraft } from "@/lib/draft";
+import { DEFAULT_COMMISSION_PERCENT } from "@/lib/domain/constants";
 import { addEvent } from "@/lib/store/events";
 import { persistEvent } from "@/lib/supabase/write";
-import { formatXAF } from "@/lib/utils";
+import { formatMoney, toMinor } from "@/lib/international/money";
+import { getCountryConfig } from "@/lib/international/config";
+import "@/lib/international/seed";
+import { localDateTimeToUtc } from "@/lib/international/time";
 import type { EventCategory, EventItem } from "@/lib/types";
 
 function slugify(value: string): string {
@@ -33,9 +37,13 @@ function ApercuWizard() {
 
   if (!draft) return <main className="min-h-screen bg-[#080412]" />;
 
-  const gross = draft.ticketTypes.reduce((sum, t) => sum + t.price * t.quantity, 0);
-  const commission = Math.round(gross * 0.1);
+  const config = getCountryConfig(draft.countryCode);
+  const currency = draft.currency || config.currency;
+  const timeZone = draft.timeZone || config.timeZone;
+  const gross = draft.ticketTypes.reduce((sum, t) => sum + toMinor(t.price, currency) * t.quantity, 0);
+  const commission = Math.round(gross * DEFAULT_COMMISSION_PERCENT / 100);
   const net = gross - commission;
+  const money = (amountMinor: number) => formatMoney(amountMinor, currency, config.locale);
   const incomplete = !draft.title.trim() || !draft.category || !draft.city || !draft.date || !draft.startTime || !draft.venue.trim();
 
   async function publish() {
@@ -53,10 +61,15 @@ function ApercuWizard() {
       category: draft.category as EventCategory,
       description: draft.description.trim(),
       venue: draft.venue.trim(),
-      city: draft.city as EventItem["city"],
+      city: draft.city.trim(),
       address: draft.address.trim(),
-      date: formatDraftDate(draft.date),
-      doorsOpenTime: draft.doorsOpenTime || "20h00",
+      countryCode: config.countryCode,
+      currency,
+      timeZone,
+      locale: config.locale,
+      date: formatDraftDate(draft.date, timeZone, config.locale),
+      startAtUtc: localDateTimeToUtc(draft.date, draft.startTime, timeZone),
+      doorsOpenTime: draft.doorsOpenTime || "",
       startTime: draft.startTime,
       imageUrl: draft.imageUrl,
       artistName: draft.title.trim(),
@@ -75,6 +88,15 @@ function ApercuWizard() {
       commissionPercent: 10,
       payoutMethod: draft.payoutMethod,
       payoutPhone: draft.payoutPhone.trim(),
+      guaranteeEnabled: true,
+      splitEnabled: true,
+      groupValidationMode: "all_or_nothing",
+      holdHours: 24,
+      branding: {
+        primaryColor: "#8B5CF6",
+        secondaryColor: "#D4A22A",
+        backgroundColor: "#0A0A0B",
+      },
     };
 
     addEvent(event);
@@ -115,7 +137,7 @@ function ApercuWizard() {
             {draft.ticketTypes.map((t) => (
               <div key={t.id} className="flex items-center justify-between border-b border-white/5 pb-2 last:border-0 last:pb-0 text-sm">
                 <span>{t.name || "Sans nom"}</span>
-                <span className="font-mono text-white/70">{t.quantity} × {formatXAF(t.price)}</span>
+                <span className="font-mono text-white/70">{t.quantity} × {money(toMinor(t.price, currency))}</span>
               </div>
             ))}
           </div>
@@ -123,22 +145,22 @@ function ApercuWizard() {
           <div className="grid sm:grid-cols-3 gap-3">
             <div className="rounded-2xl bg-white/5 p-4">
               <p className="text-[11px] uppercase text-white/40">Ventes potentielles</p>
-              <p className="text-lg font-black mt-1">{formatXAF(gross)}</p>
+              <p className="text-lg font-black mt-1">{money(gross)}</p>
             </div>
             <div className="rounded-2xl bg-red-500/10 border border-red-400/20 p-4">
-              <p className="text-[11px] uppercase text-red-200/70">Commission 10 %</p>
-              <p className="text-lg font-black mt-1 text-red-300">− {formatXAF(commission)}</p>
+              <p className="text-[11px] uppercase text-red-200/70">Commission {DEFAULT_COMMISSION_PERCENT} %</p>
+              <p className="text-lg font-black mt-1 text-red-300">− {money(commission)}</p>
             </div>
             <div className="rounded-2xl bg-emerald-500/10 border border-emerald-400/20 p-4">
               <p className="text-[11px] uppercase text-emerald-200/70">Vous recevez</p>
-              <p className="text-lg font-black mt-1 text-emerald-300">{formatXAF(net)}</p>
+              <p className="text-lg font-black mt-1 text-emerald-300">{money(net)}</p>
             </div>
           </div>
 
           <div className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-white/60">
             <ShieldCheck className="w-5 h-5 shrink-0 text-emerald-400" />
             <span>
-              Reversement prévu sur {draft.payoutMethod === "mtn" ? "MTN Mobile Money" : "Airtel Money"} au{" "}
+              Reversement prévu via {draft.payoutMethod.toUpperCase()} vers{" "}
               <strong className="text-white">{draft.payoutPhone || "numéro non renseigné"}</strong>.
               Vous pourrez vendre des billets depuis le Guichet Express et contrôler les entrées avec le Scanner.
             </span>

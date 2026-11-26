@@ -7,10 +7,11 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { RequireAuth } from "@/components/system/RequireAuth";
 import { WizardSteps } from "@/components/system/WizardSteps";
 import { loadDraft, saveDraft, type EventDraft } from "@/lib/draft";
+import { getCountryConfig, listCountryConfigs } from "@/lib/international/config";
+import "@/lib/international/seed";
 import type { EventCategory } from "@/lib/types";
 
 const CATEGORIES: EventCategory[] = ["Concert", "Festival", "VIP Pass", "Sport", "Spectacle"];
-const CITIES = ["Brazzaville", "Pointe-Noire", "Dolisie", "Oyo"] as const;
 const IMAGES = [
   "/images/ticket_bg.jpg",
   "/images/concert_guitarist.jpg",
@@ -38,7 +39,7 @@ function InfosWizard() {
 
   const next = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!draft.title.trim() || !draft.category || !draft.description.trim() || !draft.date || !draft.startTime || !draft.venue.trim() || !draft.city) {
+    if (!draft.title.trim() || !draft.category || !draft.description.trim() || !draft.date || !draft.startTime || !draft.venue.trim() || !draft.city || !draft.countryCode) {
       setError("Remplissez tous les champs obligatoires.");
       return;
     }
@@ -58,7 +59,7 @@ function InfosWizard() {
         <form onSubmit={next} className="space-y-5 rounded-3xl border border-white/10 bg-[#0E0A1C] p-6 sm:p-8">
           <label className={label}>
             <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Nom de l&apos;événement *</span>
-            <input className={field} value={draft.title} onChange={(e) => update({ title: e.target.value })} placeholder="Ex: Godman Afro-Fusion Festival 2027" required />
+            <input className={field} value={draft.title} onChange={(e) => update({ title: e.target.value })} placeholder="Ex: Festival International 2027" required />
           </label>
 
           <div className="grid sm:grid-cols-2 gap-5">
@@ -70,11 +71,37 @@ function InfosWizard() {
               </select>
             </label>
             <label className={label}>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Ville *</span>
-              <select className={field} value={draft.city} onChange={(e) => update({ city: e.target.value as EventDraft["city"] })} required>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Pays *</span>
+              <select
+                className={field}
+                value={draft.countryCode}
+                onChange={(e) => {
+                  const config = getCountryConfig(e.target.value);
+                  update({
+                    countryCode: config.countryCode,
+                    currency: config.currency,
+                    timeZone: config.timeZone,
+                    payoutMethod: config.paymentMethods[0] ?? "card",
+                  });
+                }}
+                required
+              >
                 <option value="">Choisir…</option>
-                {CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                {listCountryConfigs().map((c) => (
+                  <option key={c.countryCode} value={c.countryCode}>{c.countryCode} — {c.currency}</option>
+                ))}
               </select>
+            </label>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-5">
+            <label className={label}>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Ville *</span>
+              <input className={field} value={draft.city} onChange={(e) => update({ city: e.target.value })} placeholder="Ex: Paris" required />
+            </label>
+            <label className={label}>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Devise / Fuseau</span>
+              <input className={`${field} opacity-70`} readOnly value={draft.countryCode ? `${draft.currency} · ${draft.timeZone}` : "Sélectionnez un pays"} />
             </label>
           </div>
 

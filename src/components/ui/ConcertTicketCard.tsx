@@ -17,7 +17,7 @@ export interface ConcertTicketCardProps {
 export function ConcertTicketCard({
   eventName = "LIVE SONG REGISTRATION TICKET",
   category = "CONCERT PASS",
-  price = "15 000 FCFA",
+  price = "Prix à l'unité",
   ticketCode = "GR-89421-50284",
   rotate = "-rotate-6",
   className = "",
@@ -56,13 +56,13 @@ export function ConcertTicketCard({
           {/* Dégradé bleuté d'ambiance */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#070D1F] via-[#0B1736]/40 to-transparent" />
           
-          {/* LOGO VOICE / GODMAN STAGE */}
+          {/* LOGO VOICE / GRTK STAGE */}
           <div className="relative z-10 pt-6 px-5 flex flex-col items-center text-center">
             <div className="w-9 h-9 rounded-full bg-blue-600/30 backdrop-blur-md border border-blue-300/40 flex items-center justify-center text-cyan-300 shadow-lg shadow-blue-500/30 mb-1">
               <Mic2 className="w-5 h-5" />
             </div>
             <span className="font-display tracking-widest text-xs uppercase text-blue-200">
-              GODMAN STAGE
+              GRTK STAGE
             </span>
           </div>
 

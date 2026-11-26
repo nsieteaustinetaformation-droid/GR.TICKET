@@ -2,7 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import QRCode from "qrcode";
-import { cn, formatXAF, formatDateBrazza } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { getCountryConfig } from "@/lib/international/config";
+import "@/lib/international/seed";
+import { formatMoney } from "@/lib/international/money";
+import { formatInZone } from "@/lib/international/time";
 import { Badge } from "./Badge";
 import { Button } from "./Button";
 import {
@@ -25,6 +29,10 @@ export interface TicketProps {
   eventDate: string | Date;
   location: string;
   city?: string;
+  countryCode?: string;
+  currency?: string;
+  locale?: string;
+  timeZone?: string;
   buyerName: string;
   buyerPhone?: string;
   status: "valide" | "utilise" | "annule";
@@ -40,7 +48,11 @@ export function Ticket({
   price,
   eventDate,
   location,
-  city = "Brazzaville",
+  city = "",
+  countryCode,
+  currency,
+  locale,
+  timeZone,
   buyerName,
   buyerPhone,
   status = "valide",
@@ -50,6 +62,10 @@ export function Ticket({
 }: TicketProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [copied, setCopied] = useState<boolean>(false);
+  const config = getCountryConfig(countryCode);
+  const resolvedCurrency = currency ?? config.currency;
+  const resolvedLocale = locale ?? config.locale;
+  const resolvedZone = timeZone ?? config.timeZone;
 
   // Génération du QR Code haute densité avec jeton signé ou payload sécurisé
   useEffect(() => {
@@ -94,9 +110,9 @@ export function Ticket({
         {/* CORPS PRINCIPAL DU BILLET (Fond Noir Profond) */}
         <div className="relative flex-1 p-6 md:p-8 flex flex-col justify-between">
           
-          {/* Filigrane / Watermark Label Godman Records */}
+          {/* Filigrane GRTK */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 select-none pointer-events-none opacity-[0.03] text-8xl font-black font-display uppercase tracking-widest text-[#D4A22A]">
-            GODMAN
+            GRTK
           </div>
 
           {/* En-tête du Billet */}
@@ -108,10 +124,10 @@ export function Ticket({
                 </div>
                 <div>
                   <span className="text-xs font-bold uppercase tracking-wider text-[#D4A22A] block leading-none">
-                    GODMAN RECORDS
+                    GRTK
                   </span>
                   <span className="text-[10px] text-[#A8A39A] uppercase tracking-widest">
-                    Billetterie Officielle
+                    Billetterie internationale
                   </span>
                 </div>
               </div>
@@ -145,7 +161,7 @@ export function Ticket({
                 <Calendar className="w-3.5 h-3.5 text-[#D4A22A]" /> Date & Heure
               </span>
               <p className="font-semibold text-sm text-[#F5F1E8]">
-                {formatDateBrazza(eventDate)}
+                {formatInZone(new Date(eventDate).toISOString(), resolvedZone, resolvedLocale === "fr" ? "fr-FR" : "en-US")}
               </p>
             </div>
 
@@ -154,7 +170,7 @@ export function Ticket({
                 <MapPin className="w-3.5 h-3.5 text-[#D4A22A]" /> Lieu
               </span>
               <p className="font-semibold text-sm text-[#F5F1E8]">
-                {location}, {city}
+                {location}{city ? `, ${city}` : ""}
               </p>
             </div>
 
@@ -194,7 +210,7 @@ export function Ticket({
                 Tarif Unitaire
               </span>
               <span className="font-mono font-black text-2xl text-[#F5F1E8] font-tabular">
-                {price === 0 ? "GRATUIT" : formatXAF(price)}
+                {price === 0 ? "GRATUIT" : formatMoney(price, resolvedCurrency, resolvedLocale)}
               </span>
             </div>
           </div>

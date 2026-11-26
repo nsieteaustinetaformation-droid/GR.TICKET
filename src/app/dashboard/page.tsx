@@ -13,8 +13,11 @@ import { getEventsByOwner } from "@/lib/store/events";
 import { getAllOrders } from "@/lib/store/orders";
 import { getAllScans } from "@/lib/store/scans";
 import { useStoreVersion } from "@/lib/store/subscribe";
-import { formatXAF } from "@/lib/utils";
-import type { Order, ScanRecord } from "@/lib/types";
+import { DEFAULT_COMMISSION_PERCENT } from "@/lib/domain/constants";
+import { getCountryConfig } from "@/lib/international/config";
+import "@/lib/international/seed";
+import { formatMoney } from "@/lib/international/money";
+import type { EventItem, Order, ScanRecord } from "@/lib/types";
 
 function DashboardInner() {
   const router = useRouter();
@@ -32,13 +35,21 @@ function DashboardInner() {
 
   useEffect(() => { refresh(); }, [version, user?.id]);
 
-  const myEvents = user ? getEventsByOwner(user.id) : [];
+  const myEvents: EventItem[] = user ? getEventsByOwner(user.id) : [];
   const myIds = new Set(myEvents.map((e) => e.id));
+  const eventsById = new Map(myEvents.map((e) => [e.id, e]));
   const paidOrders = orders.filter((o) => myIds.has(o.eventId) && o.paymentStatus === "completed");
   const totalRevenue = paidOrders.reduce((s, o) => s + o.totalAmount, 0);
   const totalTickets = paidOrders.reduce((s, o) => s + o.ticketCount, 0);
-  const commission = Math.round(totalRevenue * 0.1);
+  const commission = Math.round(totalRevenue * DEFAULT_COMMISSION_PERCENT / 100);
   const netRevenue = totalRevenue - commission;
+
+  const moneyFor = (amount: number, eventId?: string) => {
+    const event = eventId ? eventsById.get(eventId) : undefined;
+    const config = getCountryConfig(event?.countryCode);
+    return formatMoney(amount, event?.currency ?? config.currency, config.locale);
+  };
+  const mainConfig = getCountryConfig(myEvents[0]?.countryCode);
   const totalEntries = scans.filter((s) => myIds.has(s.eventId) && s.result === "SUCCESS").length;
   const publishedEvents = myEvents.filter((e) => e.status === "published");
 
@@ -79,7 +90,7 @@ function DashboardInner() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-[10px] text-[#6E6589] font-mono hidden sm:block">
-            {lastRefresh ? lastRefresh.toLocaleTimeString("fr-CG") : "--:--"}
+            {lastRefresh ? lastRefresh.toLocaleTimeString(mainConfig.locale === "fr" ? "fr-FR" : "en-US") : "--:--"}
           </span>
           <button onClick={refresh} className="p-2 rounded-lg hover:bg-white/5" title="Actualiser">
             <RefreshCw className="w-4 h-4 text-[#A59EBF]" />
@@ -99,7 +110,7 @@ function DashboardInner() {
               {publishedEvents.length === 0 ? "Créez votre premier événement" : "Gérez vos événements et vos ventes"}
             </h1>
             <p className="text-sm text-white/60">
-              Vous créez vos événements, vous vendez vos billets. La plateforme prélève 10 % sur chaque vente et vous reverse 90 %.
+              Vous créez vos événements, vous vendez vos billets. La plateforme prélève {DEFAULT_COMMISSION_PERCENT} % sur chaque vente et vous reverse {100 - DEFAULT_COMMISSION_PERCENT} %.
             </p>
             <Link
               href="/evenements/nouveau/infos"
@@ -114,7 +125,7 @@ function DashboardInner() {
         {/* Chiffres clés */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: "Chiffre d'affaires", value: formatXAF(totalRevenue), icon: DollarSign, color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20" },
+            { label: "Chiffre d'affaires", value: moneyFor(totalRevenue), icon: DollarSign, color: "text-purple-400", bg: "bg-purple-500/10 border-purple-500/20" },
             { label: "Billets vendus", value: String(totalTickets), icon: TicketIcon, color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
             { label: "Entrées validées", value: String(totalEntries), icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
             { label: "Mes événements", value: String(publishedEvents.length), icon: Calendar, color: "text-cyan-400", bg: "bg-cyan-500/10 border-cyan-500/20" },
@@ -137,15 +148,15 @@ function DashboardInner() {
           <div className="grid sm:grid-cols-3 gap-4">
             <div>
               <p className="text-[11px] uppercase text-white/40">Total des ventes</p>
-              <p className="text-lg font-black mt-1">{formatXAF(totalRevenue)}</p>
+              <p className="text-lg font-black mt-1">{moneyFor(totalRevenue)}</p>
             </div>
             <div>
-              <p className="text-[11px] uppercase text-red-200/60">Commission Godman (10 %)</p>
-              <p className="text-lg font-black mt-1 text-red-300">− {formatXAF(commission)}</p>
+              <p className="text-[11px] uppercase text-red-200/60">Commission GRTK ({DEFAULT_COMMISSION_PERCENT} %)</p>
+              <p className="text-lg font-black mt-1 text-red-300">− {moneyFor(commission)}</p>
             </div>
             <div>
-              <p className="text-[11px] uppercase text-emerald-200/70">Vous recevez (90 %)</p>
-              <p className="text-lg font-black mt-1 text-emerald-300">{formatXAF(netRevenue)}</p>
+              <p className="text-[11px] uppercase text-emerald-200/70">Vous recevez ({100 - DEFAULT_COMMISSION_PERCENT} %)</p>
+              <p className="text-lg font-black mt-1 text-emerald-300">{moneyFor(netRevenue)}</p>
             </div>
           </div>
         </div>
@@ -181,7 +192,7 @@ function DashboardInner() {
                       </td>
                       <td className="px-4 py-4 text-right font-mono font-bold text-purple-300">{evTickets}</td>
                       <td className="px-4 py-4 text-right font-mono font-bold text-emerald-400">{evEntries}</td>
-                      <td className="px-4 py-4 text-right font-heading font-black text-white">{formatXAF(evRevenue)}</td>
+                      <td className="px-4 py-4 text-right font-heading font-black text-white">{moneyFor(evRevenue, ev.id)}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <div className="flex-1 h-2 bg-[#251846] rounded-full overflow-hidden min-w-[60px]">
@@ -224,7 +235,7 @@ function DashboardInner() {
                     <p className="text-xs text-[#A59EBF] truncate">{order.eventTitle}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="font-heading font-black text-sm">{formatXAF(order.totalAmount)}</p>
+                    <p className="font-heading font-black text-sm">{moneyFor(order.totalAmount, order.eventId)}</p>
                     <p className="text-[10px] font-bold uppercase text-[#A59EBF]">{order.paymentMethod} · {order.ticketCount} billet(s)</p>
                   </div>
                 </div>

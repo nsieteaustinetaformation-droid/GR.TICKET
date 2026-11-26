@@ -7,8 +7,10 @@ import { ArrowLeft, ArrowRight, ShieldCheck } from "lucide-react";
 import { RequireAuth } from "@/components/system/RequireAuth";
 import { WizardSteps } from "@/components/system/WizardSteps";
 import { loadDraft, saveDraft, type EventDraft } from "@/lib/draft";
-import { formatXAF } from "@/lib/utils";
-import type { PaymentMethod } from "@/lib/types";
+import { DEFAULT_COMMISSION_PERCENT } from "@/lib/domain/constants";
+import { formatMoney, toMinor } from "@/lib/international/money";
+import { getCountryConfig } from "@/lib/international/config";
+import "@/lib/international/seed";
 
 const field =
   "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:border-purple-400";
@@ -22,8 +24,12 @@ function CommissionWizard() {
 
   if (!draft) return <main className="min-h-screen bg-[#080412]" />;
 
-  const gross = draft.ticketTypes.reduce((sum, t) => sum + t.price * t.quantity, 0);
-  const commission = Math.round(gross * 0.1);
+  const config = getCountryConfig(draft.countryCode);
+  const currency = draft.currency || config.currency;
+  const money = (amountMinor: number) => formatMoney(amountMinor, currency, config.locale);
+  const payoutMethods = config.paymentMethods.length > 0 ? config.paymentMethods : ["card"];
+  const gross = draft.ticketTypes.reduce((sum, t) => sum + toMinor(t.price, currency) * t.quantity, 0);
+  const commission = Math.round(gross * DEFAULT_COMMISSION_PERCENT / 100);
   const net = gross - commission;
 
   const update = (patch: Partial<EventDraft>) => {
@@ -47,7 +53,7 @@ function CommissionWizard() {
           <ArrowLeft className="w-4 h-4" /> Étape précédente
         </Link>
         <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight mt-6">Commission & paiement</h1>
-        <p className="text-sm text-white/50 mt-1">Étape 3 sur 4 — la plateforme prélève 10 % sur chaque vente.</p>
+        <p className="text-sm text-white/50 mt-1">Étape 3 sur 4 — la plateforme prélève {DEFAULT_COMMISSION_PERCENT} % sur chaque vente.</p>
         <div className="mt-8"><WizardSteps current={3} /></div>
 
         <form onSubmit={next} className="space-y-5">
@@ -59,15 +65,15 @@ function CommissionWizard() {
             <div className="grid sm:grid-cols-3 gap-4">
               <div className="rounded-2xl bg-white/5 p-4">
                 <p className="text-[11px] uppercase text-white/40">Ventes potentielles</p>
-                <p className="text-lg font-black mt-1">{formatXAF(gross)}</p>
+                <p className="text-lg font-black mt-1">{money(gross)}</p>
               </div>
               <div className="rounded-2xl bg-red-500/10 border border-red-400/20 p-4">
-                <p className="text-[11px] uppercase text-red-200/70">Commission Godman (10 %)</p>
-                <p className="text-lg font-black mt-1 text-red-300">− {formatXAF(commission)}</p>
+                <p className="text-[11px] uppercase text-red-200/70">Commission GRTK ({DEFAULT_COMMISSION_PERCENT} %)</p>
+                <p className="text-lg font-black mt-1 text-red-300">− {money(commission)}</p>
               </div>
               <div className="rounded-2xl bg-emerald-500/10 border border-emerald-400/20 p-4">
-                <p className="text-[11px] uppercase text-emerald-200/70">Vous recevez (90 %)</p>
-                <p className="text-lg font-black mt-1 text-emerald-300">{formatXAF(net)}</p>
+                <p className="text-[11px] uppercase text-emerald-200/70">Vous recevez ({100 - DEFAULT_COMMISSION_PERCENT} %)</p>
+                <p className="text-lg font-black mt-1 text-emerald-300">{money(net)}</p>
               </div>
             </div>
             <p className="text-[11px] text-white/40">
@@ -78,7 +84,7 @@ function CommissionWizard() {
           <div className="rounded-3xl border border-white/10 bg-[#0E0A1C] p-6 sm:p-8 space-y-4">
             <h2 className="text-xs font-bold uppercase tracking-wider text-white/60">Où recevoir votre argent ?</h2>
             <div className="grid grid-cols-2 gap-3">
-              {(["mtn", "airtel"] as PaymentMethod[]).map((method) => (
+              {payoutMethods.map((method) => (
                 <button
                   key={method}
                   type="button"
@@ -89,17 +95,17 @@ function CommissionWizard() {
                       : "border-white/10 bg-white/5 text-white/50"
                   }`}
                 >
-                  {method === "mtn" ? "MTN Mobile Money" : "Airtel Money"}
+                  {method.toUpperCase()}
                 </button>
               ))}
             </div>
             <label className="block space-y-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Numéro de réception (+242)</span>
-              <input className={field} value={draft.payoutPhone} onChange={(e) => update({ payoutPhone: e.target.value })} placeholder="+242 06 123 45 67" required />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Coordonnées de réception ({config.countryCode || "international"})</span>
+              <input className={field} value={draft.payoutPhone} onChange={(e) => update({ payoutPhone: e.target.value })} placeholder="Numéro ou identifiant selon le moyen de paiement" required />
             </label>
             <label className="flex items-start gap-3 text-xs text-white/60 cursor-pointer">
               <input type="checkbox" checked={draft.accepted} onChange={(e) => update({ accepted: e.target.checked })} className="mt-1 w-4 h-4 accent-purple-500" />
-              <span>J&apos;accepte que la plateforme prélève 10 % sur chaque billet vendu et me reverse 90 % des ventes.</span>
+              <span>J&apos;accepte que la plateforme prélève {DEFAULT_COMMISSION_PERCENT} % sur chaque billet vendu et me reverse {100 - DEFAULT_COMMISSION_PERCENT} % des ventes.</span>
             </label>
           </div>
 

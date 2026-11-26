@@ -5,11 +5,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | GODMAN RECORDS TIKET",
-    default: "GODMAN RECORDS TIKET — Billetterie Événementielle & Musique (Congo-Brazzaville)",
+    template: "%s | GRTK",
+    default: "GRTK — Billetterie internationale, billets garantis et paiement à plusieurs",
   },
   description:
-    "Plateforme de billetterie professionnelle de nouvelle génération pour le label musical Godman Records et les organisateurs au Congo-Brazzaville. Paiements MTN & Airtel Money, billets WhatsApp et contrôle sécurisé.",
+    "Plateforme internationale de billetterie : événements dans leur devise et fuseau, billets garantis GRTK, QR dynamique et paiement à plusieurs.",
   icons: {
     icon: "/favicon.ico",
   },

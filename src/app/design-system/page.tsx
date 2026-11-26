@@ -25,7 +25,10 @@ import {
 import { Ticket } from "@/components/ui/Ticket";
 import { ConcertTicketCard } from "@/components/ui/ConcertTicketCard";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { formatXAF, generateTicketCode } from "@/lib/utils";
+import { generateTicketCode } from "@/lib/utils";
+import { getCountryConfig } from "@/lib/international/config";
+import "@/lib/international/seed";
+import { formatMoney, toMinor } from "@/lib/international/money";
 import {
   Phone,
   Search,
@@ -44,6 +47,9 @@ import {
 import Link from "next/link";
 
 export default function DesignSystemPage() {
+  const demoConfig = getCountryConfig("FR");
+  const money = (amount: number) =>
+    formatMoney(toMinor(amount, demoConfig.currency, demoConfig.locale), demoConfig.currency, demoConfig.locale);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [testTicketCode, setTestTicketCode] = useState("GR-7K8MX-9P2TW");
   const [ticketStatus, setTicketStatus] = useState<"valide" | "utilise" | "annule">("valide");
@@ -56,7 +62,7 @@ export default function DesignSystemPage() {
         <div>
           <div className="flex items-center gap-3">
             <span className="px-3 py-1 rounded-full bg-[var(--gold-subtle)] border border-[var(--gold-primary)] text-[var(--gold-primary)] font-mono text-xs font-semibold uppercase tracking-wider">
-              GODMAN RECORDS TIKET v1.0
+              GRTK v1.0
             </span>
             <span className="text-xs text-[var(--text-secondary)] font-mono">
               WCAG AA Compliant
@@ -67,7 +73,7 @@ export default function DesignSystemPage() {
           </h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)] max-w-2xl">
             Système visuel à très haut contraste, taillé pour une lisibilité parfaite en plein soleil
-            et dans les salles de concert sombres de Brazzaville et Pointe-Noire.
+            et dans les salles de concert du monde entier.
           </p>
         </div>
 
@@ -171,7 +177,7 @@ export default function DesignSystemPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <p className="font-display text-3xl font-black uppercase text-[var(--text-primary)]">
-                FESTIVAL GODMAN LIVE 2026
+                FESTIVAL GRTK LIVE 2026
               </p>
               <p className="text-xs text-[var(--text-secondary)]">
                 Utilisé pour l'identité visuelle scénique, les affiches, les titres de billets et les en-têtes.
@@ -205,13 +211,13 @@ export default function DesignSystemPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <p className="font-mono text-lg font-bold text-[var(--gold-primary)] font-tabular">
-                {formatXAF(25000)} • 14:30:00
+                {money(25000)} • 14:30:00
               </p>
               <p className="font-mono text-sm text-[var(--text-secondary)] tracking-wider">
                 GR-4K9NX-7B2QZ
               </p>
               <p className="text-xs text-[var(--text-secondary)]">
-                Chiffres à espacement fixe tabulaire pour aligner les recettes au franc près.
+                Chiffres à espacement fixe tabulaire pour aligner les recettes au centime près.
               </p>
             </CardContent>
           </Card>
@@ -271,8 +277,8 @@ export default function DesignSystemPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <Input
-            label="Numéro WhatsApp (Congo +242)"
-            placeholder="+242 06 123 45 67"
+            label="Numéro WhatsApp (indicatif international)"
+            placeholder="+33 6 12 34 56 78"
             required
             leftIcon={<Phone className="w-4 h-4" />}
             helperText="Le billet numérique sera envoyé directement sur ce WhatsApp."
@@ -326,7 +332,7 @@ export default function DesignSystemPage() {
           <Alert
             variant="success"
             title="Paiement MTN Money Confirmé"
-            description="La transaction #TX-98421 a été validée avec succès. Le billet a été généré et expédié au +242 06 500 12 34."
+            description="La transaction #TX-98421 a été validée avec succès. Le billet a été généré et expédié au +33 6 50 12 34 56."
           />
 
           <Alert
@@ -385,7 +391,7 @@ export default function DesignSystemPage() {
               <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-app)] space-y-2">
                 <div className="flex justify-between text-xs text-[var(--text-secondary)]">
                   <span>Événement :</span>
-                  <span className="font-bold text-[var(--text-primary)]">GODMAN LIVE CONCERT</span>
+                  <span className="font-bold text-[var(--text-primary)]">GRTK LIVE CONCERT</span>
                 </div>
                 <div className="flex justify-between text-xs text-[var(--text-secondary)]">
                   <span>Catégorie :</span>
@@ -393,13 +399,13 @@ export default function DesignSystemPage() {
                 </div>
                 <div className="flex justify-between text-xs text-[var(--text-secondary)]">
                   <span>Montant perçu :</span>
-                  <span className="font-mono font-bold text-[var(--text-primary)]">{formatXAF(15000)}</span>
+                  <span className="font-mono font-bold text-[var(--text-primary)]">{money(15000)}</span>
                 </div>
               </div>
 
               <Input
                 label="Bénéficiaire"
-                defaultValue="Merveil Makosso"
+                defaultValue="Alice Martin"
                 placeholder="Nom complet"
               />
             </div>
@@ -434,12 +440,12 @@ export default function DesignSystemPage() {
               <TableCell className="font-mono font-bold text-[var(--gold-primary)]">
                 GR-8K4MX-1A9TW
               </TableCell>
-              <TableCell>Dieudonné Ondongo</TableCell>
+              <TableCell>Alice Martin</TableCell>
               <TableCell>
                 <span className="font-medium">MTN Mobile Money</span>
               </TableCell>
               <TableCell className="font-mono font-bold font-tabular">
-                {formatXAF(10000)}
+                {money(10000)}
               </TableCell>
               <TableCell>
                 <Badge variant="success">Billet Émis</Badge>
@@ -453,12 +459,12 @@ export default function DesignSystemPage() {
               <TableCell className="font-mono font-bold text-[var(--gold-primary)]">
                 GR-3P9LZ-6V8NQ
               </TableCell>
-              <TableCell>Grace Loubaki</TableCell>
+              <TableCell>Bob Martin</TableCell>
               <TableCell>
                 <span className="font-medium">Airtel Money</span>
               </TableCell>
               <TableCell className="font-mono font-bold font-tabular">
-                {formatXAF(25000)}
+                {money(25000)}
               </TableCell>
               <TableCell>
                 <Badge variant="success">Billet Émis</Badge>
@@ -472,12 +478,12 @@ export default function DesignSystemPage() {
               <TableCell className="font-mono font-bold text-[var(--gold-primary)]">
                 GR-7T2KQ-5D9XY
               </TableCell>
-              <TableCell>Gaspard Moukassa</TableCell>
+              <TableCell>Charlie Dupont</TableCell>
               <TableCell>
                 <span className="font-medium">Espèces (Guichet)</span>
               </TableCell>
               <TableCell className="font-mono font-bold font-tabular">
-                {formatXAF(5000)}
+                {money(5000)}
               </TableCell>
               <TableCell>
                 <Badge variant="alert">Scanné Entrée</Badge>
@@ -490,13 +496,13 @@ export default function DesignSystemPage() {
         </Table>
       </section>
 
-      {/* SECTION 9 : LE BILLET D'EXCEPTION GODMAN RECORDS */}
+      {/* SECTION 9 : LE BILLET D'EXCEPTION GRTK */}
       <section className="space-y-6 pt-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h2 className="text-3xl font-bold font-display uppercase tracking-wide text-[var(--text-primary)] flex items-center gap-2">
               <TicketIcon className="w-6 h-6 text-[var(--gold-primary)]" />
-              9. Le Billet d'Exception « Godman Records »
+              9. Le Billet d'Exception « GRTK »
             </h2>
             <p className="text-xs text-[var(--text-secondary)]">
               Corps noir textile, talon or détachable avec QR signé HMAC, code Crockford anti-ambiguïté, filigrane du label.
@@ -543,9 +549,9 @@ export default function DesignSystemPage() {
               ★ Format Pass Concert 3D (Éditorial)
             </span>
             <ConcertTicketCard
-              eventName="GODMAN LIVE PASS"
+              eventName="GRTK LIVE PASS"
               category="VIP ALL-ACCESS"
-              price="25 000 FCFA"
+              price={money(25000)}
               ticketCode={testTicketCode}
               rotate="-rotate-3"
             />
@@ -557,14 +563,14 @@ export default function DesignSystemPage() {
             </span>
             <Ticket
               ticketCode={testTicketCode}
-              eventName="GODMAN AFRO-FUSION NIGHT"
+              eventName="GRTK AFRO-FUSION NIGHT"
               category="VIP"
               price={25000}
               eventDate="2026-11-28T20:30:00+01:00"
               location="Palais des Congrès"
-              city="Brazzaville"
-              buyerName="Aimé Césaire Kouka"
-              buyerPhone="+242 06 612 34 56"
+              city="Paris"
+              buyerName="Alice Martin"
+              buyerPhone="+33 6 61 23 45 67"
               status={ticketStatus}
               gate="Porte A - Accès VIP"
               onShareWhatsApp={() => {
@@ -578,7 +584,7 @@ export default function DesignSystemPage() {
       {/* PIED DE PAGE DESIGN SYSTEM */}
       <footer className="pt-10 border-t border-[var(--border-app)] text-center text-xs text-[var(--text-secondary)] space-y-2">
         <p className="font-display uppercase tracking-widest text-[var(--gold-primary)] text-sm font-bold">
-          GODMAN RECORDS TIKET • REPUBLIQUE DU CONGO
+          GRTK • BILLETTERIE INTERNATIONALE
         </p>
         <p>
           Conception UI/UX sur mesure • Noir & Or Haut Contraste • Conformité WCAG AA (4.5:1 minimum)

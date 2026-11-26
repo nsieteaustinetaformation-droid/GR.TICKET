@@ -1,115 +1,170 @@
-# GODMAN RECORDS TIKET
+# GRTK — Billetterie internationale
 
-> **SaaS de billetterie événementielle et musicale de nouvelle génération pour la République du Congo (Brazzaville & Pointe-Noire).**
+Plateforme de billetterie internationale pour organisateurs : création d'événements, vente de billets, **Garantie GRTK** et **Payez à plusieurs**.
 
-Plateforme professionnelle taillée pour le label musical **Godman Records** et les organisateurs d'événements. Elle permet la création d'événements, la vente de billets en ligne et au guichet via **MTN Mobile Money** et **Airtel Money** (XAF / FCFA), la délivrance instantanée par **WhatsApp**, et le contrôle d'accès haute vitesse avec scan de QR code sécurisé (y compris en mode hors-ligne sans connexion internet).
-
----
-
-## 🌟 Points Forts du Produit
-
-1. **Design System « Noir & Or » Haut Contraste :**
-   - Palette exclusive `#0A0A0B` (fond), `#121214` (surface), `#D4A22A` (or principal), `#F0C75E` (or survol).
-   - Thème sombre par défaut et thème clair disponibles.
-   - Conformité stricte aux standards d'accessibilité **WCAG AA** (contraste 4.5:1 minimum).
-   - Typographies d'impact : *Big Shoulders Display* (titres majuscules), *DM Sans* (texte UI), *JetBrains Mono* (chiffres tabulaires et codes billets).
-   - Cibles tactiles minimum de 44 px pour le terrain.
-
-2. **Billets Infalsifiables :**
-   - Code court lisible `GR-XXXXX-XXXXX` encodé sur l'alphabet Crockford anti-ambiguïté (sans 0/O, 1/I/L).
-   - QR code cryptographique contenant un jeton signé **HMAC-SHA256**.
-   - Verrou transactionnel en base de données empêchant le double scan et le surbooking.
-
-3. **Paiements Locaux (XAF / FCFA) :**
-   - Couche d'abstraction `PaymentProvider` avec support multi-prestataires (Sandbox de simulation, Guichet manuel avec vérification d'unicité SMS, et connecteurs MTN / Airtel).
-
-4. **Distribution WhatsApp Immédiate :**
-   - Mode direct sans frais via lien `wa.me` prérempli (+242 Congo-Brazzaville).
-   - Mode automatisé par WhatsApp Business Cloud API.
-
-5. **Contrôle d'Accès PWA :**
-   - Application installable sur smartphone contrôleur.
-   - Fonctionne avec ou sans connexion internet grâce à IndexedDB et synchronisation intelligente des conflits.
+Aucune valeur propre à un pays, une ville ou une devise n'est codée dans le métier : pays, devise, fuseau, taxe, moyens de paiement et politique de garantie sont des **données de configuration** (`src/lib/international/seed.ts` en développement, tables `countries` / `tax_rules` / `payment_methods` / `guarantee_policies` en production).
 
 ---
 
-## 🚀 Démarrage Rapide
+## Démarrage
 
-### Prérequis
-- Node.js 20+ ou 24+
-- npm 10+
-
-### Installation
 ```bash
-# Cloner le dépôt
-git clone https://github.com/nsieteaustinetaformation-droid/GR.TICKET.git
-cd GR.TICKET
-
-# Installer les dépendances
 npm install
-
-# Copier les variables d'environnement
-cp .env.example .env.local
-
-# Lancer le serveur de développement
-npm run dev -- --port 3010
+npm run dev
+npm test
+npm run build
 ```
 
-Accéder à l'application :
-- **Accueil (redirection vers le dashboard) :** [http://localhost:3010](http://localhost:3010)
-- **Connexion / création de compte :** [http://localhost:3010/connexion](http://localhost:3010/connexion)
-- **Vitrine Design System :** [http://localhost:3010/design-system](http://localhost:3010/design-system)
+- Accueil : `/` → `/dashboard` (puis `/connexion` si non connecté)
+- Connexion : `/connexion`
+- Création d'événement : `/evenements/nouveau/infos` → `/billets` → `/commission` → `/apercu`
+- Page événement : `/evenements/[slug]`
+- Panier : `/panier?event=ID`
+- Lien de groupe : `/groupe/[token]`
+- Billet : `/billet/[id]`
+- Réclamation : `/reclamation?ticket=ID`
+- Administration garantie : `/admin/garantie`
 
-## 🔁 Fonctionnement
-
-1. L'utilisateur crée un compte (email + mot de passe) sur `/connexion`.
-2. Il arrive sur son **tableau de bord** : ses événements, ses ventes, ses entrées.
-3. Il crée un événement en **4 pages** : Informations → Billets → Commission 10 % → Aperçu et publication.
-4. Il vend depuis le **Guichet Express** et contrôle les entrées avec le **Scanner**.
-5. La plateforme prélève **10 %** sur chaque vente ; l'organisateur reçoit **90 %** sur son numéro Mobile Money.
-
-Aucun événement n'est pré-créé par la plateforme. Sans Supabase configuré, l'application fonctionne en **mode démo** sur cet appareil (comptes et événements simulés).
+Sans Supabase, l'application tourne en **mode démo** (données sur l'appareil).
 
 ---
 
-## 🗄️ Connexion Supabase
+## Socle international
 
-1. Crée un projet sur [supabase.com](https://supabase.com).
-2. Dans **SQL Editor**, exécute le contenu de `supabase/schema.sql` (même si vous l'avez déjà fait : le script est sans danger à relancer).
-3. Dans **Authentication → Providers**, active **Email**.
-4. Copie `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY` depuis **Project Settings → API**.
-5. Ajoute ces deux variables dans `.env.local` et dans **Vercel → Settings → Environment Variables**.
-6. Redéploie. Les comptes passent par Supabase Auth et chaque événement créé est lié à son organisateur.
-
-> `SUPABASE_SERVICE_ROLE_KEY` reste côté serveur uniquement (jamais exposé au navigateur).
-
----
-
-## 🎨 Composants du Design System (Étape 1)
-
-Le projet intègre une bibliothèque complète de composants personnalisés :
-- `Button` : Dégradé or, contour or, secondaire, danger, ghost, états de chargement (44px min-touch).
-- `Input` : Champs haute lisibilité avec icônes gauche/droite, anneau or 2px au focus, gestion d'erreurs bilingues.
-- `Badge` : Double encodage couleur + icône obligatoire (Succès, Alerte, Erreur, Information, Or VIP, Neutre).
-- `Alert` : Bannières contextuelles d'état avec icône dédiée et actions.
-- `Card` : Cartes surface, surélevées et interactives avec rayon de 12px.
-- `Modal` : Boîte de dialogue accessible avec accent doré et touche Échap.
-- `Table` : Tableau avec chiffres tabulaires pour montants XAF et dates Brazzaville.
-- `Ticket` : Le composant d'exception (corps noir, filigrane Godman, découpe perforée, talon or avec QR haute résolution).
-- `ThemeToggle` : Bascule instantanée entre thème sombre et thème clair.
+| Sujet | Implémentation |
+|---|---|
+| Devises | Montants en **unités mineures entières** + code ISO 4217 (`src/lib/international/money.ts`) |
+| Taxes | `tax_rules` par pays, mode `inclusive` ou `exclusive` |
+| Temps | Stockage **UTC**, affichage dans le fuseau IANA du lieu (`src/lib/international/time.ts`) |
+| Langues | `fr` et `en` (`src/lib/international/messages.ts`), structure extensible |
+| Paiements | Interface `PaymentProvider` + registre (`src/lib/payments/`). Ajouter un moyen = 1 adaptateur + 1 ligne de config |
+| Config pays | `src/lib/international/config.ts` + `seed.ts` (remplaçable par la base) |
 
 ---
 
-## 🛠️ Stack Technique
-- **Framework :** Next.js 16 (App Router, Turbopack)
-- **Langage :** TypeScript strict
-- **Styling :** Tailwind CSS v4 + Variables CSS dynamiques
-- **Icônes :** Lucide React
-- **Validation :** Zod & React Hook Form
-- **Génération QR :** qrcode (correction d'erreur High)
-- **Base de Données & Auth :** PostgreSQL (Supabase RLS)
+## Garantie GRTK
+
+> Ton billet entre à la porte, sinon tu es remboursé.
+
+- QR dynamique : le scanner émet un **défi (nonce)** valable 30 s ; l'application GRTK signe le défi avec la **clé privée de l'appareil lié**. Le QR change à chaque fenêtre de 30 s.
+- Une capture d'écran ou une photocopie ne peut pas répondre à un nouveau défi.
+- Double scan refusé et journalisé (`scan_logs`, `audit_logs`).
+- Transfert/revente uniquement via GRTK, prix plafonné ; l'ancienne version du QR est invalidée.
+- Réclamation avec motif + photo : décision automatique pour les cas clairs, escalade agent sinon.
+- Paramètres : dédommagement, délai de réclamation et réserve financière par pays.
+- Admin : réclamations, taux de fraude, coût total de la garantie, journaux d'audit.
+
+Fichiers : `src/lib/domain/{qr,transfers,claims,reservations}.ts`.
+
+## Payez à plusieurs
+
+- L'acheteur choisit N places, reçoit un lien unique et le partage (WhatsApp, SMS, copie).
+- Chaque participant paie sa part avec son propre moyen de paiement.
+- Réservation temporaire (24 h par défaut, configurable) ; expiration libère les places.
+- Règle par défaut : **tout ou rien**. Option `paid_seats` disponible par événement.
+- Suivi en direct, rappels automatiques à 50 % et 90 % du délai.
+- Chaque participant reçoit son billet garanti nominatif.
+- Idempotence des paiements et webhooks ; protection contre la sur-réservation (RPC `reserve_seats`).
+
+Fichiers : `src/lib/domain/groups.ts`, `src/lib/server/state.ts`.
 
 ---
 
-## 📄 Licence
-Propriétaire • Godman Records © 2026. Tous droits réservés.
+## Endpoints API
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| POST | `/api/v1/events/:id/reservations` | Réserver des places avec TTL |
+| POST | `/api/v1/groups` | Créer un lien de paiement groupé |
+| GET | `/api/v1/groups/:token` | Voir le suivi du groupe |
+| POST | `/api/v1/groups/:token/shares/:shareId/pay` | Payer une part |
+| POST | `/api/v1/payments/webhook/:provider` | Webhook signé et idempotent |
+| POST | `/api/v1/tickets/:id/qr/challenge` | Obtenir un défi scanner |
+| GET | `/api/v1/tickets/:id/qr/token?nonce=...` | QR dynamique signé (30 s) |
+| POST | `/api/v1/scanner/verify` | Vérifier défi + appareil + billet |
+| POST | `/api/v1/tickets/:id/transfer` | Transférer/revendre |
+| GET | `/api/v1/tickets/:id` | Lire un billet et son audit |
+| GET | `/api/v1/tickets/:id/pass?kind=apple\|google` | Point d'intégration Wallet |
+| POST | `/api/v1/claims` | Déposer une réclamation |
+| PATCH | `/api/v1/admin/claims/:id` | Décision agent |
+| GET | `/api/v1/admin/guarantee/stats` | Statistiques garantie |
+| GET/POST | `/api/v1/cron/release-expired-groups` | Expiration + rappels |
+
+### Exemples
+
+```bash
+# Créer un groupe de 2 places à 50,00 EUR chacune
+curl -X POST /api/v1/groups -H 'content-type: application/json' -d '{
+  "eventId":"evt_1","eventTitle":"Festival","initiatorName":"Alice",
+  "countryCode":"FR","currency":"EUR","unitAmountMinor":5000,
+  "quantity":2,"capacity":100,"validationMode":"all_or_nothing"
+}'
+
+# Payer sa part (clé d'idempotence unique)
+curl -X POST /api/v1/groups/TOKEN/shares/SHARE_ID/pay -H 'content-type: application/json' -d '{
+  "holderName":"Bob","methodCode":"card","idempotencyKey":"bob-1"
+}'
+
+# Vérifier un scan
+curl -X POST /api/v1/scanner/verify -H 'content-type: application/json' -d '{"token":"...","scannerId":"gate-1"}'
+```
+
+---
+
+## Base de données
+
+`supabase/schema.sql` est idempotent. Il crée notamment :
+
+- configuration : `countries`, `currencies`, `tax_rules`, `payment_providers`, `payment_methods`, `guarantee_policies` ;
+- groupes : `reservations`, `group_payments`, `group_shares`, `payment_intents` ;
+- garantie : `tickets`, `qr_tokens`, `device_bindings`, `transfers`, `scan_logs`, `refund_claims`, `audit_logs` ;
+- fonction `reserve_seats()` (verrou `_FOR UPDATE_` anti-sur-réservation) ;
+- fonction `delete_my_data()` (RGPD) et politiques RLS par propriétaire/participant.
+
+Relancer le script après une mise à jour : il ne supprime aucune donnée métier.
+
+### Variables d'environnement
+
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+PAYMENT_WEBHOOK_SECRET
+CARD_PROVIDER_MODE=live|simulation
+MOBILE_MONEY_MODE=live|simulation
+GRTK_COMPENSATION_PERCENT=0
+GRTK_CLAIM_WINDOW_HOURS=72
+GRTK_RESERVE_MINOR=0
+GOOGLE_WALLET_ISSUER_ID
+GOOGLE_WALLET_SERVICE_ACCOUNT_JSON
+APPLE_PASS_CERTIFICATE
+APPLE_PASS_KEY
+APPLE_PASS_TEAM_ID
+```
+
+Les passes Wallet ne sont générés que si les credentials correspondants sont fournis ; sinon l'endpoint répond `501 WALLET_CREDENTIALS_NOT_CONFIGURED`.
+
+---
+
+## Tests
+
+`npm test` exécute 13 suites :
+
+1. Codes billets Crockford anti-ambiguïté
+2. Signature HMAC et détection d'altération
+3. Formatage WhatsApp international
+4. Anti-replay / double scan
+5. Devises, taxes et pays inconnu
+6. Fuseaux horaires (20:00 local → 18:00 UTC → 20:00 affiché)
+7. Sur-réservation et expiration des réservations
+8. Paiement partiel, idempotence et tout ou rien
+9. Expiration d'un groupe et remboursement
+10. QR dynamique : défi, rotation 30 s, rejeu, capture refusée
+11. Transfert : prix plafonné et ancien QR invalidé
+12. Réclamation : auto-approbation, fraude, coût garantie
+13. Rappels à mi-délai et avant expiration
+
+---
+
+## Stack
+
+Next.js 16 (App Router, Turbopack), TypeScript strict, Tailwind CSS v4, Supabase/Postgres + RLS, React Query, Zod, qrcode, Lucide.

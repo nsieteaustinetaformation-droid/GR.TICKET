@@ -36,12 +36,12 @@ export function getTotalTicketsSold(): number {
   return _orders.filter(o => o.paymentStatus === 'completed').reduce((s, o) => s + o.ticketCount, 0);
 }
 
-export function getRevenueByPaymentMethod(): { mtn: number; airtel: number; cash: number } {
-  return _orders.filter(o => o.paymentStatus === 'completed').reduce(
+export function getRevenueByPaymentMethod(): Record<string, number> {
+  return _orders.filter(o => o.paymentStatus === 'completed').reduce<Record<string, number>>(
     (acc, o) => {
       acc[o.paymentMethod] = (acc[o.paymentMethod] || 0) + o.totalAmount;
       return acc;
     },
-    { mtn: 0, airtel: 0, cash: 0 }
+    {}
   );
 }

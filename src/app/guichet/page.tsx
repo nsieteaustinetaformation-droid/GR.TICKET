@@ -11,7 +11,10 @@ import { getEventsByCategory } from "@/lib/store/events";
 import { useStoreVersion } from "@/lib/store/subscribe";
 import { addOrder } from "@/lib/store/orders";
 import { createOrderFromPurchase, buildWhatsAppMessage, formatWhatsAppUrl } from "@/lib/ticket-engine";
-import { formatXAF } from "@/lib/utils";
+import { getCountryConfig } from "@/lib/international/config";
+import "@/lib/international/seed";
+import { paymentMethodLabel, type Locale } from "@/lib/international/messages";
+import { formatMoney } from "@/lib/international/money";
 import type { EventItem, TicketType, PaymentMethod, Order } from "@/lib/types";
 import { RequireAuth } from "@/components/system/RequireAuth";
 
@@ -24,8 +27,8 @@ function GuichetPageInner() {
   const [selectedType, setSelectedType] = useState<TicketType | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [buyerName, setBuyerName] = useState("");
-  const [buyerPhone, setBuyerPhone] = useState("+242 06 ");
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("mtn");
+  const [buyerPhone, setBuyerPhone] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("card");
   const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [elapsed, setElapsed] = useState<number | null>(null);
@@ -34,6 +37,11 @@ function GuichetPageInner() {
   useEffect(() => {
     startTime.current = Date.now();
   }, []);
+
+  const config = getCountryConfig(selectedEvent?.countryCode);
+  const locale: Locale = config.locale;
+  const money = (amount: number) => formatMoney(amount, selectedEvent?.currency ?? config.currency, locale);
+  const paymentOptions = config.paymentMethods.length > 0 ? config.paymentMethods : ["card"];
 
   const filteredEvents = getEventsByCategory("Tous").filter(e =>
     e.status === "published" &&
@@ -63,7 +71,7 @@ function GuichetPageInner() {
     if (!selectedEvent || !selectedType) return;
     const order = createOrderFromPurchase({
       event: selectedEvent, ticketType: selectedType, buyerName: buyerName || "Client Guichet",
-      buyerPhone: buyerPhone || "+242 06 000 00 00", paymentMethod, quantity,
+      buyerPhone: buyerPhone || "—", paymentMethod, quantity,
     });
     addOrder(order);
     const now = Date.now();
@@ -79,8 +87,8 @@ function GuichetPageInner() {
     setSelectedType(null);
     setQuantity(1);
     setBuyerName("");
-    setBuyerPhone("+242 06 ");
-    setPaymentMethod("mtn");
+    setBuyerPhone("");
+    setPaymentMethod("card");
     setCompletedOrder(null);
     setSearchQuery("");
     setElapsed(null);
@@ -186,7 +194,7 @@ function GuichetPageInner() {
                               style={{ width: pct + "%" }} />
                           </div>
                           <span className="text-[10px] font-mono text-[#6E6589] shrink-0">{pct}% vendu</span>
-                          <span className="text-xs font-heading font-black text-white shrink-0">des {formatXAF(minPrice)}</span>
+                          <span className="text-xs font-heading font-black text-white shrink-0">des {money(minPrice)}</span>
                         </div>
                       </div>
                     </div>
@@ -239,7 +247,7 @@ function GuichetPageInner() {
                         </p>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="font-heading font-black text-2xl text-white">{formatXAF(tt.price)}</span>
+                        <span className="font-heading font-black text-2xl text-white">{money(tt.price)}</span>
                         <span className="block text-[10px] text-[#6E6589] uppercase font-medium mt-0.5">par billet</span>
                         {!isSoldOut && (
                           <span className="mt-3 inline-flex items-center gap-1 bg-purple-600 text-white text-xs font-bold px-3 py-1.5 rounded-full group-hover:bg-purple-500 transition-colors">
@@ -271,17 +279,17 @@ function GuichetPageInner() {
                   <User className="inline w-3.5 h-3.5 mr-1" />Nom Complet
                 </label>
                 <input
-                  type="text" placeholder="Ex: Merveil Makosso"
+                  type="text" placeholder="Ex: Alice Martin"
                   value={buyerName} onChange={e => setBuyerName(e.target.value)}
                   className="w-full bg-[#120B24] border border-[#251846] rounded-xl px-4 py-3.5 text-sm text-white placeholder-[#6E6589] focus:outline-none focus:border-purple-500 transition-colors"
                 />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-[#A59EBF] uppercase tracking-wider mb-2">
-                  <Phone className="inline w-3.5 h-3.5 mr-1" />Numero WhatsApp (+242)
+                  <Phone className="inline w-3.5 h-3.5 mr-1" />Numéro WhatsApp (indicatif international)
                 </label>
                 <input
-                  type="tel" placeholder="+242 06 XXX XX XX"
+                  type="tel" placeholder="Ex: +33 6 12 34 56 78"
                   value={buyerPhone} onChange={e => setBuyerPhone(e.target.value)}
                   className="w-full bg-[#120B24] border border-[#251846] rounded-xl px-4 py-3.5 text-sm text-white placeholder-[#6E6589] focus:outline-none focus:border-purple-500 transition-colors font-mono"
                 />
@@ -302,7 +310,7 @@ function GuichetPageInner() {
               </div>
               <div className="flex items-center justify-between p-4 bg-[#0D0820] border border-[#251846] rounded-xl">
                 <span className="text-sm text-[#A59EBF]">Total a payer</span>
-                <span className="font-heading font-black text-xl text-white">{formatXAF(selectedType.price * quantity)}</span>
+                <span className="font-heading font-black text-xl text-white">{money(selectedType.price * quantity)}</span>
               </div>
               <button type="submit" className="btn-neon-purple w-full py-4 text-sm font-black uppercase tracking-wider flex items-center justify-center gap-2">
                 Continuer vers Paiement
@@ -323,27 +331,20 @@ function GuichetPageInner() {
             </div>
             <form onSubmit={handleConfirmPayment} className="space-y-4">
               <div className="grid grid-cols-1 gap-3">
-                {([
-                  { key: "mtn", label: "MTN Mobile Money", sub: "+242 06 / 07...", color: "amber" },
-                  { key: "airtel", label: "Airtel Money", sub: "+242 04 / 05...", color: "red" },
-                  { key: "cash", label: "Especes (Guichet)", sub: "Paiement en main propre", color: "emerald" },
-                ] as const).map(opt => (
-                  <button key={opt.key} type="button" onClick={() => setPaymentMethod(opt.key)}
+                {paymentOptions.map(method => (
+                  <button key={method} type="button" onClick={() => setPaymentMethod(method)}
                     className={"w-full p-4 rounded-2xl border flex items-center gap-4 transition-all " +
-                      (paymentMethod === opt.key
-                        ? (opt.color === "amber" ? "border-amber-400 bg-amber-500/10" :
-                            opt.color === "red" ? "border-red-500 bg-red-500/10" : "border-emerald-500 bg-emerald-500/10")
+                      (paymentMethod === method
+                        ? "border-purple-400 bg-purple-500/10"
                         : "border-[#251846] bg-[#120B24] hover:border-white/20")}>
-                    <div className={"w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shrink-0 " +
-                      (opt.color === "amber" ? "bg-amber-500 text-amber-950" :
-                        opt.color === "red" ? "bg-red-600 text-white" : "bg-emerald-600 text-white")}>
-                      {opt.key === "mtn" ? "M" : opt.key === "airtel" ? "A" : "$"}
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xs shrink-0 bg-purple-500 text-white">
+                      {paymentMethodLabel(locale, method).slice(0, 1)}
                     </div>
                     <div className="text-left">
-                      <span className="block font-bold text-sm text-white">{opt.label}</span>
-                      <span className="block text-xs text-[#A59EBF]">{opt.sub}</span>
+                      <span className="block font-bold text-sm text-white">{paymentMethodLabel(locale, method)}</span>
+                      <span className="block text-xs text-[#A59EBF]">{config.currency} · {config.countryCode}</span>
                     </div>
-                    {paymentMethod === opt.key && <CheckCircle2 className={"w-5 h-5 ml-auto " + (opt.color === "amber" ? "text-amber-400" : opt.color === "red" ? "text-red-400" : "text-emerald-400")} />}
+                    {paymentMethod === method && <CheckCircle2 className="w-5 h-5 ml-auto text-purple-400" />}
                   </button>
                 ))}
               </div>
@@ -357,7 +358,7 @@ function GuichetPageInner() {
                   <div className="flex justify-between text-[#A59EBF]"><span>Billets</span><span className="text-white font-medium">{quantity}</span></div>
                   <div className="flex justify-between pt-2 border-t border-[#251846]">
                     <span className="text-[#A59EBF] font-semibold">TOTAL</span>
-                    <span className="font-heading font-black text-base text-white">{formatXAF(selectedType.price * quantity)}</span>
+                    <span className="font-heading font-black text-base text-white">{money(selectedType.price * quantity)}</span>
                   </div>
                 </div>
               </div>
@@ -380,7 +381,7 @@ function GuichetPageInner() {
                 <p className="text-xs text-emerald-400 font-mono mt-1">Traite en {elapsed}s</p>
               )}
               <p className="text-sm text-[#A59EBF] mt-2">
-                {completedOrder.ticketCount} billet(s) genere(s) — {formatXAF(completedOrder.totalAmount)} via {completedOrder.paymentMethod.toUpperCase()}
+                {completedOrder.ticketCount} billet(s) genere(s) — {money(completedOrder.totalAmount)} via {completedOrder.paymentMethod.toUpperCase()}
               </p>
             </div>
 
@@ -406,7 +407,7 @@ function GuichetPageInner() {
                     </div>
                     <div>
                       <span className="text-[#6E6589] uppercase block">Prix Paye</span>
-                      <span className="text-white font-heading font-black mt-0.5 block">{formatXAF(ticket.price)}</span>
+                      <span className="text-white font-heading font-black mt-0.5 block">{money(ticket.price)}</span>
                     </div>
                   </div>
                   <div className="px-5 pb-4">

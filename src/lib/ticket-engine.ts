@@ -79,7 +79,7 @@ export function createOrderFromPurchase(params: {
 
 export function buildWhatsAppMessage(ticket: Ticket): string {
   const lines = [
-    '** BILLET OFFICIEL GODMAN RECORDS TIKET **',
+    '** BILLET OFFICIEL GRTK — GARANTI **',
     '',
     'Evenement: ' + ticket.eventTitle,
     'Lieu: ' + ticket.eventVenue,
@@ -90,7 +90,7 @@ export function buildWhatsAppMessage(ticket: Ticket): string {
     'Statut: VALIDE',
     '',
     'Conservez ce message — il servira au controle d entree.',
-    'QR disponible sur : https://tiket.godmanrecords.com/ticket/' + ticket.id,
+    'Billet et QR dynamique : ' + (process.env.NEXT_PUBLIC_APP_URL ?? 'https://gr-ticket-theta.vercel.app') + '/billet/' + ticket.id,
   ];
   return lines.join('\n');
 }
