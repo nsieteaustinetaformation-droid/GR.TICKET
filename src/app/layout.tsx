@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { SupabaseBootstrap } from "@/components/system/SupabaseBootstrap";
+import { AuthProvider } from "@/lib/auth";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -29,8 +30,10 @@ export default function RootLayout({
   return (
     <html lang="fr" data-theme="dark" className="h-full">
       <body className="min-h-full flex flex-col bg-[var(--bg-app)] text-[var(--text-primary)] antialiased selection:bg-[var(--gold-primary)] selection:text-black">
-        <SupabaseBootstrap />
-        {children}
+        <AuthProvider>
+          <SupabaseBootstrap />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

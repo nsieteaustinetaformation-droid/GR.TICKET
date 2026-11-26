@@ -14,12 +14,9 @@ import {
   type ScanRow,
   type TicketTypeRow,
 } from "./mappers";
-import { seedEventsIfEmpty } from "./write";
 
 export async function loadAllFromSupabase(): Promise<boolean> {
   if (!supabase) return false;
-
-  await seedEventsIfEmpty();
 
   const [eventsResult, typesResult, ordersResult, scansResult] = await Promise.all([
     supabase.from("events").select("*").order("title"),
@@ -35,18 +32,16 @@ export async function loadAllFromSupabase(): Promise<boolean> {
   const eventRows = (eventsResult.data ?? []) as EventRow[];
   const typeRows = (typesResult.data ?? []) as TicketTypeRow[];
 
-  if (eventRows.length > 0) {
-    setEvents(
-      eventRows.map((row) =>
-        eventFromRow(
-          row,
-          typeRows
-            .filter((type) => type.event_id === row.id)
-            .map(ticketTypeFromRow)
-        )
+  setEvents(
+    eventRows.map((row) =>
+      eventFromRow(
+        row,
+        typeRows
+          .filter((type) => type.event_id === row.id)
+          .map(ticketTypeFromRow)
       )
-    );
-  }
+    )
+  );
 
   if (ordersResult.data) {
     setOrders((ordersResult.data as OrderRow[]).map(orderFromRow));

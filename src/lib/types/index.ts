@@ -36,6 +36,10 @@ export interface EventItem {
   status: EventStatus;
   featured?: boolean;
   ticketTypes: TicketType[];
+  ownerId?: string;
+  commissionPercent?: number;
+  payoutMethod?: PaymentMethod;
+  payoutPhone?: string;
 }
 
 export interface Ticket {

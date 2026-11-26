@@ -56,18 +56,30 @@ npm run dev -- --port 3010
 ```
 
 Accéder à l'application :
-- **Page d'accueil :** [http://localhost:3010](http://localhost:3010)
+- **Accueil (redirection vers le dashboard) :** [http://localhost:3010](http://localhost:3010)
+- **Connexion / création de compte :** [http://localhost:3010/connexion](http://localhost:3010/connexion)
 - **Vitrine Design System :** [http://localhost:3010/design-system](http://localhost:3010/design-system)
+
+## 🔁 Fonctionnement
+
+1. L'utilisateur crée un compte (email + mot de passe) sur `/connexion`.
+2. Il arrive sur son **tableau de bord** : ses événements, ses ventes, ses entrées.
+3. Il crée un événement en **4 pages** : Informations → Billets → Commission 10 % → Aperçu et publication.
+4. Il vend depuis le **Guichet Express** et contrôle les entrées avec le **Scanner**.
+5. La plateforme prélève **10 %** sur chaque vente ; l'organisateur reçoit **90 %** sur son numéro Mobile Money.
+
+Aucun événement n'est pré-créé par la plateforme. Sans Supabase configuré, l'application fonctionne en **mode démo** sur cet appareil (comptes et événements simulés).
 
 ---
 
 ## 🗄️ Connexion Supabase
 
 1. Crée un projet sur [supabase.com](https://supabase.com).
-2. Dans **SQL Editor**, exécute le contenu de `supabase/schema.sql`.
-3. Copie `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY` depuis **Project Settings → API**.
-4. Ajoute ces deux variables dans `.env.local` et dans **Vercel → Settings → Environment Variables**.
-5. Redéploie. Au premier chargement, les événements de démonstration sont insérés automatiquement dans Supabase.
+2. Dans **SQL Editor**, exécute le contenu de `supabase/schema.sql` (même si vous l'avez déjà fait : le script est sans danger à relancer).
+3. Dans **Authentication → Providers**, active **Email**.
+4. Copie `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY` depuis **Project Settings → API**.
+5. Ajoute ces deux variables dans `.env.local` et dans **Vercel → Settings → Environment Variables**.
+6. Redéploie. Les comptes passent par Supabase Auth et chaque événement créé est lié à son organisateur.
 
 > `SUPABASE_SERVICE_ROLE_KEY` reste côté serveur uniquement (jamais exposé au navigateur).
 

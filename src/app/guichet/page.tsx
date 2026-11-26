@@ -13,10 +13,11 @@ import { addOrder } from "@/lib/store/orders";
 import { createOrderFromPurchase, buildWhatsAppMessage, formatWhatsAppUrl } from "@/lib/ticket-engine";
 import { formatXAF } from "@/lib/utils";
 import type { EventItem, TicketType, PaymentMethod, Order } from "@/lib/types";
+import { RequireAuth } from "@/components/system/RequireAuth";
 
 type Step = "select_event" | "select_type" | "buyer_info" | "payment" | "confirm";
 
-export default function GuichetPage() {
+function GuichetPageInner() {
   useStoreVersion();
   const [step, setStep] = useState<Step>("select_event");
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
@@ -427,4 +428,8 @@ export default function GuichetPage() {
       </div>
     </div>
   );
+}
+
+export default function GuichetPage() {
+  return <RequireAuth><GuichetPageInner /></RequireAuth>;
 }

@@ -12,6 +12,7 @@ import { getEventsByCategory } from "@/lib/store/events";
 import { useStoreVersion } from "@/lib/store/subscribe";
 import { formatXAF } from "@/lib/utils";
 import type { ScanRecord } from "@/lib/types";
+import { RequireAuth } from "@/components/system/RequireAuth";
 
 type ScanResult = "idle" | "scanning" | "SUCCESS" | "ALREADY_USED" | "INVALID_CODE" | "WRONG_EVENT";
 
@@ -22,7 +23,7 @@ const RESULT_CONFIG = {
   WRONG_EVENT:  { bg: "bg-red-500",     border: "border-red-400",     text: "MAUVAIS EVENEMENT — REFUS",   icon: XCircle,        color: "text-red-400"     },
 };
 
-export default function ScannerPage() {
+function ScannerPageInner() {
   useStoreVersion();
   const [selectedEventId, setSelectedEventId] = useState(getEventsByCategory("Tous")[0]?.id ?? "");
   const [scanResult, setScanResult] = useState<ScanResult>("idle");
@@ -275,4 +276,8 @@ export default function ScannerPage() {
       </div>
     </div>
   );
+}
+
+export default function ScannerPage() {
+  return <RequireAuth><ScannerPageInner /></RequireAuth>;
 }

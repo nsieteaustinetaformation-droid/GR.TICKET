@@ -19,6 +19,10 @@ export interface EventRow {
   organizer: string;
   status: string;
   featured: boolean;
+  owner_id: string | null;
+  commission_percent: number;
+  payout_method: string | null;
+  payout_phone: string | null;
 }
 
 export interface TicketTypeRow {
@@ -82,6 +86,10 @@ export function eventToRow(event: EventItem): EventRow {
     organizer: event.organizer,
     status: event.status,
     featured: Boolean(event.featured),
+    owner_id: event.ownerId ?? null,
+    commission_percent: event.commissionPercent ?? 10,
+    payout_method: event.payoutMethod ?? null,
+    payout_phone: event.payoutPhone ?? null,
   };
 }
 
@@ -105,6 +113,10 @@ export function eventFromRow(row: EventRow, ticketTypes: TicketType[]): EventIte
     organizer: row.organizer,
     status: row.status as EventItem["status"],
     featured: row.featured,
+    ownerId: row.owner_id ?? undefined,
+    commissionPercent: row.commission_percent ?? 10,
+    payoutMethod: (row.payout_method as EventItem["payoutMethod"]) ?? undefined,
+    payoutPhone: row.payout_phone ?? undefined,
     ticketTypes,
   };
 }
