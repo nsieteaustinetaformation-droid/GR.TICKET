@@ -111,6 +111,14 @@ curl -X POST /api/v1/scanner/verify -H 'content-type: application/json' -d '{"to
 
 ---
 
+## Maquette 3D réaliste
+
+- `/maquette-3d` : aperçu du rendu (fond clair, trois billets inclinés, carton épais, reflet holographique, ombre portée et talon perforé).
+- Le vrai billet (`/billet/:id`) utilise le même habillage via `RealisticTicket3D` ; le QR dynamique et les actions PNG/PDF/Wallet restent identiques.
+- La couleur de la tranche suit `event.branding.primaryColor` : aucun style n'est figé par événement.
+
+---
+
 ## Base de données
 
 `supabase/schema.sql` est idempotent. Il crée notamment :

@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ProfessionalTicket } from "@/components/grtk/ProfessionalTicket";
+import { RealisticTicket3D } from "@/components/grtk/RealisticTicket3D";
 import { getCountryConfig } from "@/lib/international/config";
 import "@/lib/international/seed";
 import { normalizeLocale } from "@/lib/international/messages";
@@ -60,14 +61,16 @@ function TicketView() {
     <main className="min-h-screen bg-[#080412] px-4 py-10 text-white">
       <div className="mx-auto max-w-3xl space-y-6">
         <Link href="/dashboard" className="text-xs text-white/50 hover:text-white">← Tableau de bord</Link>
-        <ProfessionalTicket
-          ticket={ticket}
-          branding={event?.branding}
-          locale={locale}
-          localDate={localDate}
-          venue={event?.venue ?? ""}
-          city={event?.city ?? ""}
-        />
+        <RealisticTicket3D edgeColor={event?.branding?.primaryColor}>
+          <ProfessionalTicket
+            ticket={ticket}
+            branding={event?.branding}
+            locale={locale}
+            localDate={localDate}
+            venue={event?.venue ?? ""}
+            city={event?.city ?? ""}
+          />
+        </RealisticTicket3D>
 
         <div className="rounded-2xl border border-white/10 bg-[#0E0A1C] p-5 text-sm">
           <h2 className="text-xs font-bold uppercase tracking-wider text-white/60">Transférer le billet</h2>

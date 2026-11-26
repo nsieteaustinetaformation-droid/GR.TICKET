@@ -80,6 +80,11 @@ export default function DesignSystemPage() {
         {/* CONTROLES THÈME & ACCÈS RAPIDE */}
         <div className="flex items-center gap-3">
           <ThemeToggle />
+          <Link href="/maquette-3d">
+            <Button variant="outline" size="sm" rightIcon={<ArrowRight className="w-4 h-4" />}>
+              Maquette 3D
+            </Button>
+          </Link>
           <Link href="/">
             <Button variant="outline" size="sm" rightIcon={<ArrowRight className="w-4 h-4" />}>
               Accueil
