@@ -1,11 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Calendar, MapPin, Rocket, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, CheckCircle2, ImageIcon, MapPin, Rocket, ShieldCheck } from "lucide-react";
 import { RequireAuth } from "@/components/system/RequireAuth";
 import { WizardSteps } from "@/components/system/WizardSteps";
+import { FieldError } from "@/components/system/FieldError";
+import { ImagePlaceholder } from "@/components/ui/ImagePlaceholder";
+import { TicketPreview3D } from "@/components/grtk/TicketPreview3D";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { MagneticButton } from "@/components/motion/MagneticButton";
+import { Reveal } from "@/components/motion/Reveal";
+import { Confetti } from "@/components/motion/Confetti";
+import { StatusFlash } from "@/components/motion/StatusFlash";
 import { useAuth } from "@/lib/auth";
 import { clearDraft, formatDraftDate, loadDraft, type EventDraft } from "@/lib/draft";
 import { DEFAULT_COMMISSION_PERCENT } from "@/lib/domain/constants";
@@ -15,6 +23,8 @@ import { formatMoney, toMinor } from "@/lib/international/money";
 import { getCountryConfig } from "@/lib/international/config";
 import "@/lib/international/seed";
 import { localDateTimeToUtc } from "@/lib/international/time";
+import { validateEventForPublish } from "@/lib/validation/event";
+import { useStepGuard } from "@/lib/validation/useStepGuard";
 import type { EventCategory, EventItem } from "@/lib/types";
 
 function slugify(value: string): string {
@@ -30,12 +40,17 @@ function ApercuWizard() {
   const router = useRouter();
   const { user } = useAuth();
   const [draft, setDraft] = useState<EventDraft | null>(null);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
+  const [flash, setFlash] = useState<{ kind: "success" | "error"; message: string } | null>(null);
+  const [published, setPublished] = useState(false);
 
   useEffect(() => { setDraft(loadDraft()); }, []);
+  useStepGuard(4, draft !== null);
 
-  if (!draft) return <main className="min-h-screen bg-white" />;
+  const validation = useMemo(() => validateEventForPublish(draft ?? {}), [draft]);
+
+  if (!draft) return <main className="min-h-screen bg-[var(--grtk-bg)]" />;
 
   const config = getCountryConfig(draft.countryCode);
   const currency = draft.currency || config.currency;
@@ -44,144 +59,220 @@ function ApercuWizard() {
   const commission = Math.round(gross * DEFAULT_COMMISSION_PERCENT / 100);
   const net = gross - commission;
   const money = (amountMinor: number) => formatMoney(amountMinor, currency, config.locale);
-  const incomplete = !draft.title.trim() || !draft.category || !draft.city || !draft.date || !draft.startTime || !draft.venue.trim();
+  const dateText = `${formatDraftDate(draft.date, timeZone, config.locale)} à ${draft.startTime}`;
 
   async function publish() {
-    if (!draft || !user || incomplete || !draft.accepted) {
-      setError("Votre dossier est incomplet. Revenez aux étapes précédentes.");
+    setErrors({});
+    setFlash(null);
+    if (!validation.valid || !user) {
+      setErrors(validation.errors);
+      const field = validation.firstField;
+      const node = field ? document.getElementById(`field-${field}`) : null;
+      node?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setFlash({ kind: "error", message: "Votre dossier est incomplet. Corrigez les champs signalés." });
       return;
     }
 
     setBusy(true);
-    const id = crypto.randomUUID();
-    const event: EventItem = {
-      id,
-      title: draft.title.trim(),
-      slug: `${slugify(draft.title)}-${id.slice(0, 6)}`,
-      category: draft.category as EventCategory,
-      description: draft.description.trim(),
-      venue: draft.venue.trim(),
-      city: draft.city.trim(),
-      address: draft.address.trim(),
-      countryCode: config.countryCode,
-      currency,
-      timeZone,
-      locale: config.locale,
-      date: formatDraftDate(draft.date, timeZone, config.locale),
-      startAtUtc: localDateTimeToUtc(draft.date, draft.startTime, timeZone),
-      doorsOpenTime: draft.doorsOpenTime || "",
-      startTime: draft.startTime,
-      imageUrl: draft.imageUrl,
-      artistName: draft.title.trim(),
-      organizer: user.fullName || user.email,
-      status: "published",
-      ticketTypes: draft.ticketTypes.map((t) => ({
-        id: crypto.randomUUID(),
-        eventId: id,
-        name: t.name.trim(),
-        price: t.price,
-        totalQuantity: t.quantity,
-        soldQuantity: 0,
-        benefits: [],
-      })),
-      ownerId: user.id,
-      commissionPercent: 10,
-      payoutMethod: draft.payoutMethod,
-      payoutPhone: draft.payoutPhone.trim(),
-      guaranteeEnabled: true,
-      splitEnabled: true,
-      groupValidationMode: "all_or_nothing",
-      holdHours: 24,
-      branding: {
-        primaryColor: "#8B5CF6",
-        secondaryColor: "#D4A22A",
-        backgroundColor: "#FFFFFF",
-      },
-    };
+    try {
+      // Vérification serveur : même une requête directe contournant l'UI est refusée.
+      const guard = await fetch("/api/v1/events", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(draft),
+      });
+      const guardData = (await guard.json()) as { ok: boolean; errors?: Record<string, string>; firstField?: string | null };
+      if (!guard.ok || !guardData.ok) {
+        setErrors(guardData.errors ?? { form: "Publication refusée par le serveur." });
+        setFlash({ kind: "error", message: "Le serveur a refusé la publication : corrigez les champs signalés." });
+        return;
+      }
 
-    addEvent(event);
-    await persistEvent(event);
-    clearDraft();
-    router.replace("/dashboard");
+      const current = draft;
+      if (!current) return;
+      const id = crypto.randomUUID();
+      const event: EventItem = {
+        id,
+        title: current.title.trim(),
+        slug: `${slugify(current.title)}-${id.slice(0, 6)}`,
+        category: current.category as EventCategory,
+        description: current.description.trim(),
+        venue: current.venue.trim(),
+        city: current.city.trim(),
+        address: current.address.trim(),
+        countryCode: config.countryCode,
+        currency,
+        timeZone,
+        locale: config.locale,
+        date: formatDraftDate(current.date, timeZone, config.locale),
+        startAtUtc: localDateTimeToUtc(current.date, current.startTime, timeZone),
+        doorsOpenTime: current.doorsOpenTime || "",
+        startTime: current.startTime,
+        imageUrl: current.imageUrl,
+        gallery: current.gallery ?? [],
+        artistName: current.title.trim(),
+        organizer: user.fullName || user.email,
+        status: "published",
+        ticketTypes: current.ticketTypes.map((t) => ({
+          id: crypto.randomUUID(),
+          eventId: id,
+          name: t.name.trim(),
+          price: t.price,
+          totalQuantity: t.quantity,
+          soldQuantity: 0,
+          benefits: [],
+        })),
+        ownerId: user.id,
+        commissionPercent: DEFAULT_COMMISSION_PERCENT,
+        payoutMethod: current.payoutMethod,
+        payoutPhone: current.payoutPhone.trim(),
+        guaranteeEnabled: true,
+        splitEnabled: true,
+        groupValidationMode: "all_or_nothing",
+        holdHours: 24,
+        branding: {
+          logoUrl: current.organizerLogoUrl,
+          backgroundImageUrl: current.ticketBackgroundUrl,
+          primaryColor: "#7C3AED",
+          secondaryColor: "#D4A22A",
+          backgroundColor: "#FFFFFF",
+        },
+      };
+
+      addEvent(event);
+      await persistEvent(event);
+      clearDraft();
+      setPublished(true);
+      setFlash({ kind: "success", message: "Événement publié. Redirection vers votre tableau de bord…" });
+      window.setTimeout(() => router.replace("/dashboard"), 1200);
+    } catch {
+      setFlash({ kind: "error", message: "Publication interrompue. Votre brouillon est conservé : réessayez." });
+    } finally {
+      setBusy(false);
+    }
   }
 
+  const editLinks = [
+    { href: "/evenements/nouveau/infos", label: "Modifier les informations", valid: validateEventForPublish(draft).errors.title === undefined },
+    { href: "/evenements/nouveau/billets", label: "Modifier les billets", valid: validation.errors.ticketTypes === undefined },
+    { href: "/evenements/nouveau/commission", label: "Modifier la commission", valid: validation.errors.payoutMethod === undefined },
+  ];
+
   return (
-    <main className="min-h-screen bg-white px-4 py-10 text-slate-900">
-      <div className="max-w-3xl mx-auto">
-        <Link href="/evenements/nouveau/commission" className="inline-flex items-center gap-2 text-xs text-slate-500 hover:text-slate-900">
-          <ArrowLeft className="w-4 h-4" /> Étape précédente
-        </Link>
-        <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight mt-6">Dernière vérification</h1>
-        <p className="text-sm text-slate-500 mt-1">Étape 4 sur 4 — votre événement sera publié immédiatement.</p>
-        <div className="mt-8"><WizardSteps current={4} /></div>
+    <main className="min-h-screen bg-[var(--grtk-bg)] px-4 py-10 text-[var(--grtk-text)]">
+      <div className="relative mx-auto max-w-4xl space-y-5">
+        <Confetti active={published} count={16} />
+        <div className="flex items-center justify-between gap-3">
+          <Link href="/evenements/nouveau/commission" className="link-underline inline-flex items-center gap-2 text-xs text-[var(--grtk-text-3)] hover:text-violet-700">
+            <ArrowLeft className="h-4 w-4" aria-hidden /> Étape précédente
+          </Link>
+          <ThemeToggle compact />
+        </div>
+        <h1 className="font-heading text-3xl font-black uppercase tracking-tight sm:text-4xl">Dernière vérification</h1>
+        <p className="text-sm text-[var(--grtk-text-3)]">Étape 4 sur 4 — votre événement sera publié immédiatement après validation serveur.</p>
+        <div><WizardSteps current={4} /></div>
 
-        <div className="space-y-5">
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={draft.imageUrl} alt="Aperçu de l'événement" className="h-40 w-full object-cover opacity-80" />
-            <div className="p-6 sm:p-8 space-y-4">
-              <span className="inline-block rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-violet-700">
-                {draft.category || "Catégorie"}
-              </span>
-              <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900">{draft.title || "Nom de l'événement"}</h2>
-              <p className="text-sm text-slate-600">{draft.description || "Description"}</p>
-              <div className="flex flex-wrap gap-4 text-xs text-slate-600">
-                <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-violet-600" /> {formatDraftDate(draft.date)} à {draft.startTime}</span>
-                <span className="flex items-center gap-2"><MapPin className="w-4 h-4 text-violet-600" /> {draft.venue}, {draft.city}</span>
-              </div>
+        {flash && <StatusFlash kind={flash.kind} message={flash.message} onDone={() => setFlash(null)} />}
+
+        <Reveal>
+          <section className="overflow-hidden rounded-2xl border border-[var(--grtk-border)] bg-[var(--grtk-surface)] shadow-sm">
+            <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-violet-50 via-white to-violet-100">
+              {draft.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img id="field-imageUrl" src={draft.imageUrl} alt="Aperçu de l'événement" className="h-full w-full object-cover" />
+              ) : (
+                <div id="field-imageUrl"><ImagePlaceholder icon={ImageIcon} label="Aucune couverture fournie" className="h-full w-full border-0" /></div>
+              )}
             </div>
-          </div>
+            <div className="space-y-4 p-6 sm:p-8">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span className="rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-violet-700">{draft.category || "Catégorie"}</span>
+                <Link href="/evenements/nouveau/infos" className="link-underline text-[11px] font-bold uppercase tracking-wider text-violet-700">Modifier les informations</Link>
+              </div>
+              <h2 className="font-heading text-2xl font-black uppercase tracking-tight">{draft.title || "Nom de l'événement"}</h2>
+              <p className="text-sm text-[var(--grtk-text-2)]">{draft.description || "Description"}</p>
+              <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-[var(--grtk-text-2)]">
+                <span className="inline-flex items-center gap-2"><Calendar className="h-4 w-4 text-violet-600" aria-hidden /> {dateText}</span>
+                <span className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-violet-600" aria-hidden /> {draft.venue}, {draft.city}</span>
+              </div>
+              <FieldError message={errors.title ?? errors.description ?? errors.imageUrl} />
+            </div>
+          </section>
+        </Reveal>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-3 sm:p-8">
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600">Vos billets</h3>
+        <Reveal delay={60}>
+          <section className="rounded-2xl border border-[var(--grtk-border)] bg-[var(--grtk-surface)] p-6 shadow-sm">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--grtk-text-2)]">Vos billets</h3>
+              <Link href="/evenements/nouveau/billets" className="link-underline text-[11px] font-bold uppercase tracking-wider text-violet-700">Modifier les billets</Link>
+            </div>
             {draft.ticketTypes.map((t) => (
-              <div key={t.id} className="flex items-center justify-between border-b border-slate-200 pb-2 last:border-0 last:pb-0 text-sm">
+              <div key={t.id} className="flex items-center justify-between gap-4 border-b border-[var(--grtk-border)] py-2 text-sm last:border-0 last:pb-0">
                 <span>{t.name || "Sans nom"}</span>
-                <span className="font-mono text-slate-600">{t.quantity} × {money(toMinor(t.price, currency))}</span>
+                <span className="font-mono text-[var(--grtk-text-2)]">{t.quantity} × {money(toMinor(t.price, currency))}</span>
               </div>
             ))}
-          </div>
+            <FieldError message={errors.ticketTypes} />
+          </section>
+        </Reveal>
 
-          <div className="grid sm:grid-cols-3 gap-3">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-[11px] uppercase text-slate-500">Ventes potentielles</p>
-              <p className="text-lg font-black mt-1 text-slate-900">{money(gross)}</p>
+        <Reveal delay={100}>
+          <section className="rounded-2xl border border-[var(--grtk-border)] bg-[var(--grtk-surface)] p-6 shadow-sm">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--grtk-text-2)]">Votre reversement</h3>
+              <Link href="/evenements/nouveau/commission" className="link-underline text-[11px] font-bold uppercase tracking-wider text-violet-700">Modifier la commission</Link>
             </div>
-            <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
-              <p className="text-[11px] uppercase text-red-600">Commission {DEFAULT_COMMISSION_PERCENT} %</p>
-              <p className="text-lg font-black mt-1 text-red-600">− {money(commission)}</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div><p className="text-[11px] uppercase text-[var(--grtk-text-3)]">Ventes potentielles</p><p className="mt-1 font-heading text-lg font-black">{money(gross)}</p></div>
+              <div><p className="text-[11px] uppercase text-rose-700">Commission {DEFAULT_COMMISSION_PERCENT} %</p><p className="mt-1 font-heading text-lg font-black text-rose-700">− {money(commission)}</p></div>
+              <div><p className="text-[11px] uppercase text-emerald-700">Vous recevez</p><p className="mt-1 font-heading text-lg font-black text-emerald-700">{money(net)}</p></div>
             </div>
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-              <p className="text-[11px] uppercase text-emerald-700">Vous recevez</p>
-              <p className="text-lg font-black mt-1 text-emerald-700">{money(net)}</p>
-            </div>
-          </div>
+            <p className="mt-4 flex items-start gap-2 text-xs text-[var(--grtk-text-2)]">
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+              Reversement prévu via {draft.payoutMethod} vers <strong>{draft.payoutPhone || "numéro non renseigné"}</strong>.
+            </p>
+            <FieldError message={errors.payoutMethod ?? errors.payoutPhone ?? errors.accepted} />
+          </section>
+        </Reveal>
 
-          <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
-            <ShieldCheck className="w-5 h-5 shrink-0 text-emerald-600" />
-            <span>
-              Reversement prévu via {draft.payoutMethod.toUpperCase()} vers{" "}
-              <strong className="text-slate-900">{draft.payoutPhone || "numéro non renseigné"}</strong>.
-              Vous pourrez vendre des billets depuis le Guichet Express et contrôler les entrées avec le Scanner.
-            </span>
-          </div>
+        <Reveal delay={140}>
+          <section className="rounded-3xl border border-[var(--grtk-border)] bg-[var(--grtk-surface-2)] p-4 sm:p-6">
+            <TicketPreview3D
+              eventTitle={draft.title || "Nom de l'événement"}
+              dateText={dateText}
+              venue={draft.venue}
+              city={draft.city}
+              category={draft.category || "Événement"}
+              priceText={money(toMinor(draft.ticketTypes[0]?.price ?? 0, currency))}
+              primaryColor="#7C3AED"
+              locale={config.locale}
+            />
+          </section>
+        </Reveal>
 
-          {incomplete && (
-            <p className="text-xs text-amber-700">Certaines informations manquent. Retournez à l’étape 1 pour les compléter.</p>
-          )}
-          {error && <p className="text-xs text-red-600">{error}</p>}
-
-          <button
-            type="button"
-            onClick={publish}
-            disabled={busy || incomplete}
-            className="w-full rounded-xl bg-violet-600 py-4 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 text-white hover:bg-violet-700 disabled:opacity-50"
-          >
-            <Rocket className="w-4 h-4" />
-            {busy ? "Publication en cours…" : "Publier mon événement"}
-            {!busy && <ArrowRight className="w-4 h-4" />}
-          </button>
+        <div className="flex flex-wrap gap-2">
+          {editLinks.filter((link) => !link.valid).map((link) => (
+            <Link key={link.href} href={link.href} className="rounded-full border border-amber-300 bg-amber-50 px-4 py-2 text-[11px] font-bold uppercase text-amber-800">
+              {link.label} — à compléter
+            </Link>
+          ))}
         </div>
+
+        {!validation.valid && (
+          <p className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-xs text-amber-800">
+            {Object.keys(validation.errors).length} point(s) à corriger avant publication : {Object.values(validation.errors).slice(0, 3).join(" ")}
+          </p>
+        )}
+
+        <MagneticButton
+          onClick={() => void publish()}
+          disabled={busy || !validation.valid}
+          className={`btn-neon-purple flex w-full items-center justify-center gap-2 py-4 text-xs font-bold uppercase tracking-wider ${busy || !validation.valid ? "opacity-50" : ""}`}
+        >
+          {published ? <CheckCircle2 className="h-4 w-4" aria-hidden /> : <Rocket className="h-4 w-4" aria-hidden />}
+          {busy ? "Publication en cours…" : published ? "Événement publié" : "Publier mon événement"}
+          {!busy && !published && <ArrowRight className="h-4 w-4" aria-hidden />}
+        </MagneticButton>
       </div>
     </main>
   );

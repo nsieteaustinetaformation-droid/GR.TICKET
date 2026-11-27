@@ -8,6 +8,13 @@ export interface AppUser {
   email: string;
   fullName: string;
   phone: string;
+  avatarUrl: string;
+}
+
+export interface ProfileUpdate {
+  fullName?: string;
+  phone?: string;
+  avatarUrl?: string;
 }
 
 interface AuthContextValue {
@@ -16,6 +23,7 @@ interface AuthContextValue {
   isDemo: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (fullName: string, phone: string, email: string, password: string) => Promise<void>;
+  updateProfile: (patch: ProfileUpdate) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -29,6 +37,7 @@ function demoUserFromEmail(email: string): AppUser {
     email,
     fullName: name.charAt(0).toUpperCase() + name.slice(1),
     phone: "",
+    avatarUrl: "",
   };
 }
 
@@ -58,6 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: sessionUser.email ?? "",
           fullName: String(sessionUser.user_metadata?.full_name ?? ""),
           phone: String(sessionUser.user_metadata?.phone ?? ""),
+          avatarUrl: String(sessionUser.user_metadata?.avatar_url ?? ""),
         });
       }
       setLoading(false);
@@ -72,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               email: sessionUser.email ?? "",
               fullName: String(sessionUser.user_metadata?.full_name ?? ""),
               phone: String(sessionUser.user_metadata?.phone ?? ""),
+              avatarUrl: String(sessionUser.user_metadata?.avatar_url ?? ""),
             }
           : null
       );
@@ -127,10 +138,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             email: data.user.email ?? "",
             fullName: fullName.trim(),
             phone: phone.trim(),
+            avatarUrl: "",
           });
         } else {
           throw new Error("Compte créé. Confirmez votre email avant de vous connecter.");
         }
+      },
+      updateProfile: async (patch) => {
+        if (!user) throw new Error("Connectez-vous pour modifier votre profil.");
+        const next: AppUser = {
+          ...user,
+          fullName: patch.fullName?.trim() ?? user.fullName,
+          phone: patch.phone?.trim() ?? user.phone,
+          avatarUrl: patch.avatarUrl ?? user.avatarUrl,
+        };
+
+        if (!supabase) {
+          window.localStorage.setItem(DEMO_KEY, JSON.stringify(next));
+          setUser(next);
+          return;
+        }
+
+        const { error: authError } = await supabase.auth.updateUser({
+          data: { full_name: next.fullName, phone: next.phone, avatar_url: next.avatarUrl },
+        });
+        if (authError) throw new Error(authError.message);
+
+        const { error: profileError } = await supabase.from("profiles").upsert({
+          id: next.id,
+          full_name: next.fullName,
+          avatar_url: next.avatarUrl,
+          updated_at: new Date().toISOString(),
+        });
+        if (profileError) throw new Error(profileError.message);
+        setUser(next);
       },
       signOut: async () => {
         if (supabase) await supabase.auth.signOut();

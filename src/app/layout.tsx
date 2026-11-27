@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { SupabaseBootstrap } from "@/components/system/SupabaseBootstrap";
+import { ThemeProvider } from "@/components/system/ThemeProvider";
 import { AuthProvider } from "@/lib/auth";
 import "./globals.css";
 
@@ -22,18 +23,26 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
+/** Applique le thème stocké avant le premier paint (voir guide Next.js « preventing-flash-before-hydration »). */
+const themeInitScript = `(function(){try{var t=localStorage.getItem("grtk-theme");if(t==="dark"||t==="light")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" data-theme="light" className="h-full">
+    <html lang="fr" data-theme="light" className="h-full" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-full flex flex-col bg-[var(--bg-app)] text-[var(--text-primary)] antialiased selection:bg-violet-200 selection:text-violet-900">
-        <AuthProvider>
-          <SupabaseBootstrap />
-          {children}
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <SupabaseBootstrap />
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

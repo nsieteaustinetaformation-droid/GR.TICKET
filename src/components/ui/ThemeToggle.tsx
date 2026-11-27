@@ -1,14 +1,28 @@
 "use client";
 
-import React from "react";
-import { Sun } from "lucide-react";
+import type { JSX } from "react";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "@/components/system/ThemeProvider";
 
-/** L'application GRTK utilise un thème blanc unique sur toutes les pages. */
-export function ThemeToggle() {
+/** Bascule mode clair / sombre, avec persistance via ThemeProvider. */
+export function ThemeToggle({ compact = false }: { compact?: boolean }): JSX.Element {
+  const { theme, toggle, mounted } = useTheme();
+  const isDark = mounted && theme === "dark";
+  const label = isDark ? "Mode clair" : "Mode sombre";
+
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600">
-      <Sun className="h-4 w-4 text-violet-600" />
-      Mode clair
-    </span>
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label={label}
+      aria-pressed={isDark}
+      title={label}
+      className={`btn-glass-outline magnetic-btn inline-flex min-touch-target items-center justify-center gap-2 text-xs font-semibold ${
+        compact ? "h-9 w-9 px-0" : "h-9 px-3"
+      }`}
+    >
+      {isDark ? <Sun className="h-4 w-4" aria-hidden /> : <Moon className="h-4 w-4" aria-hidden />}
+      {!compact && <span>{label}</span>}
+    </button>
   );
 }

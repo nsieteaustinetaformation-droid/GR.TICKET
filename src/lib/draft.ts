@@ -21,6 +21,11 @@ export interface EventDraft {
   timeZone: string;
   address: string;
   imageUrl: string;
+  bannerUrl?: string;
+  organizerLogoUrl?: string;
+  ticketLogoUrl?: string;
+  ticketBackgroundUrl?: string;
+  gallery?: string[];
   ticketTypes: TicketTypeDraft[];
   payoutMethod: PaymentMethod;
   payoutPhone: string;
@@ -43,7 +48,7 @@ export function emptyDraft(): EventDraft {
     currency: "",
     timeZone: "",
     address: "",
-    imageUrl: "/images/ticket_bg.jpg",
+    imageUrl: "",
     ticketTypes: [{ id: crypto.randomUUID(), name: "Standard", price: 0, quantity: 10 }],
     payoutMethod: "card",
     payoutPhone: "",

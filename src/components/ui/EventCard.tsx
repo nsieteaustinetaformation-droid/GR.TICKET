@@ -1,8 +1,7 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-import { Calendar, MapPin, Ticket as TicketIcon } from "lucide-react";
+import { Calendar, ImageIcon, MapPin, Ticket as TicketIcon } from "lucide-react";
 import { getCountryConfig } from "@/lib/international/config";
 import "@/lib/international/seed";
 import { formatMoney, toMinor } from "@/lib/international/money";
@@ -34,7 +33,6 @@ export function EventCard({
   countryCode,
   currency,
   locale,
-  availableTickets = 150,
   onSelect,
 }: EventCardProps) {
   const config = getCountryConfig(countryCode);
@@ -50,14 +48,20 @@ export function EventCard({
   return (
     <div className="neon-card overflow-hidden flex flex-col justify-between group bg-white">
       {/* VIGNETTE IMAGE */}
-      <div className="relative h-44 w-full overflow-hidden bg-slate-100">
-        <Image
-          src={imageUrl}
-          alt={title}
-          fill
-          className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/35 via-transparent to-transparent" />
+      <div className="relative h-44 w-full overflow-hidden bg-gradient-to-br from-violet-50 via-white to-violet-100">
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imageUrl}
+            alt={title}
+            className="h-full w-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
+            <ImageIcon className="h-10 w-10 text-violet-300" />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 via-transparent to-transparent" />
 
         {/* BADGE CATÉGORIE EN HAUT À DROITE */}
         <div className="absolute top-3 right-3 z-10">

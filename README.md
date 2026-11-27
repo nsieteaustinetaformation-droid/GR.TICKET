@@ -86,6 +86,7 @@ Fichiers : `src/lib/domain/groups.ts`, `src/lib/server/state.ts`.
 | GET | `/api/v1/tickets/:id` | Lire un billet et son audit |
 | GET | `/api/v1/tickets/:id/pass?kind=apple\|google` | Point d'intégration Wallet |
 | POST | `/api/v1/claims` | Déposer une réclamation |
+| POST | `/api/v1/uploads` | Upload d'image (bucket `grtk-images` ou data URL en démo) |
 | PATCH | `/api/v1/admin/claims/:id` | Décision agent |
 | GET | `/api/v1/admin/guarantee/stats` | Statistiques garantie |
 | GET/POST | `/api/v1/cron/release-expired-groups` | Expiration + rappels |
@@ -108,6 +109,19 @@ curl -X POST /api/v1/groups/TOKEN/shares/SHARE_ID/pay -H 'content-type: applicat
 # Vérifier un scan
 curl -X POST /api/v1/scanner/verify -H 'content-type: application/json' -d '{"token":"...","scannerId":"gate-1"}'
 ```
+
+---
+
+## Images importées par l'utilisateur
+
+Les composants `ImageUploader` et `ImageGalleryUploader` (`src/components/ui/ImageUploader.tsx`) gèrent dépôt, presse-papiers, caméra mobile, conversion HEIC, compression, recadrage et barre de progression. Sans image, `ImagePlaceholder` affiche un cadre neutre violet clair — jamais une photo factice.
+
+Flux : le navigateur compresse l'image (≈ 0,6 Mo, 1920 px max), la recadre, puis envoie `file`, `dataUrl` et `kind` à `POST /api/v1/uploads` via XHR. Le serveur génère le chemin `kind/<uuid>.<ext>` et répond `{ ok: true, url }`.
+
+- Avec `NEXT_PUBLIC_SUPABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` renseignés : stockage durable dans le bucket public `grtk-images`, URL publique Supabase renvoyée.
+- Sans ces variables (mode démo) : l'API renvoie la data URL avec `demo: true` ; l'aperçu fonctionne mais **n'est pas persistant**.
+
+Le bucket, ses policies, `profiles.avatar_url` et `event_gallery` sont créés dans `supabase/schema.sql` (bloc idempotent à relancer).
 
 ---
 

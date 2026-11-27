@@ -1,38 +1,191 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
+/* ============================================================
+   GRTK — DESIGN TOKENS
+   Palette existante conservée, transformée en variables.
+   ============================================================ */
 :root {
-  /* Thème GRTK — blanc universal, accent violet. */
-  --bg-app: #FFFFFF;
-  --bg-surface: #FFFFFF;
-  --bg-surface-elevated: #F7F7FB;
-  --bg-muted: #F6F7FB;
-  --border-subtle: #E7E7EF;
-  --border-accent: #7C3AED;
+  /* Fonds & surfaces */
+  --grtk-bg: #FFFFFF;
+  --grtk-surface: #FFFFFF;
+  --grtk-surface-2: #F7F7FB;
+  --grtk-muted: #F6F7FB;
+  --grtk-border: #E7E7EF;
+  --grtk-border-strong: #E2E8F0;
+
+  /* Violet GRTK — valeurs d'origine */
+  --grtk-violet-50: #FAF5FF;
+  --grtk-violet-100: #F3E8FF;
+  --grtk-violet-400: #9333EA;
+  --grtk-violet-600: #7C3AED;
+  --grtk-violet-700: #6D28D9;
+  --grtk-violet-800: #5B21B6;
+  --grtk-violet-900: #4C1D95;
+
+  /* Texte */
+  --grtk-text: #111827;
+  --grtk-text-2: #4B5563;
+  --grtk-text-3: #6B7280;
+
+  /* États */
+  --grtk-success: #047857;
+  --grtk-warning: #B45309;
+  --grtk-error: #BE123C;
+  --grtk-info: #0369A1;
+  --grtk-badge-pink: #DB2777;
+  --grtk-badge-cyan: #0284C7;
+  --grtk-badge-green: #059669;
+
+  /* Anciens alias conservés pour compatibilité */
+  --bg-app: var(--grtk-bg);
+  --bg-surface: var(--grtk-surface);
+  --bg-surface-elevated: var(--grtk-surface-2);
+  --bg-muted: var(--grtk-muted);
+  --border-subtle: var(--grtk-border);
+  --border-accent: var(--grtk-violet-600);
   --border-glow: rgba(124, 58, 237, 0.18);
+  --purple-primary: var(--grtk-violet-700);
+  --purple-bright: var(--grtk-violet-600);
+  --purple-glow: var(--grtk-violet-400);
+  --purple-deep: var(--grtk-violet-900);
+  --text-white: var(--grtk-text);
+  --text-primary: var(--grtk-text);
+  --text-secondary: var(--grtk-text-2);
+  --text-muted: var(--grtk-text-3);
+  --badge-pink: var(--grtk-badge-pink);
+  --badge-cyan: var(--grtk-badge-cyan);
+  --badge-green: var(--grtk-badge-green);
 
-  --purple-primary: #6D28D9;
-  --purple-bright: #7C3AED;
-  --purple-glow: #9333EA;
-  --purple-deep: #4C1D95;
-
-  --text-white: #111827;
-  --text-primary: #111827;
-  --text-secondary: #4B5563;
-  --text-muted: #6B7280;
-
-  --badge-pink: #DB2777;
-  --badge-cyan: #0284C7;
-  --badge-green: #059669;
-
+  /* Typographie existante */
   --font-heading: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-display: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+
+  /* Rayons */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-pill: 999px;
+
+  /* Ombres & profondeur */
+  --shadow-1: 0 1px 2px rgba(17, 24, 39, 0.05);
+  --shadow-2: 0 8px 24px -12px rgba(17, 24, 39, 0.18);
+  --shadow-3: 0 24px 48px -24px rgba(76, 29, 149, 0.28);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -1px 0 rgba(17, 24, 39, 0.06);
+  --shadow-focus: 0 0 0 3px rgba(124, 58, 237, 0.18);
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.6);
+
+  /* 3D */
+  --perspective: 1400px;
+  --tilt-max: 6deg;
+  --lift: 8px;
+  --glare-opacity: 0.28;
+  --rx: 6deg;
+  --ry: -9deg;
+  --mx: 50%;
+  --my: 35%;
+
+  /* Mouvement */
+  --dur-fast: 150ms;
+  --dur-base: 220ms;
+  --dur-slow: 320ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* ---------- Mode sombre soigné, mêmes accents violets ---------- */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --grtk-bg: #0B0B10;
+  --grtk-surface: #12121A;
+  --grtk-surface-2: #191922;
+  --grtk-muted: #15151D;
+  --grtk-border: #2A2A38;
+  --grtk-border-strong: #38384A;
+
+  --grtk-text: #F5F5FA;
+  --grtk-text-2: #C4C4D0;
+  --grtk-text-3: #9A9AAB;
+
+  --grtk-violet-50: #1E1533;
+  --grtk-violet-100: #2A1D47;
+
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-2: 0 8px 24px -12px rgba(0, 0, 0, 0.7);
+  --shadow-3: 0 24px 48px -24px rgba(124, 58, 237, 0.35);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+  --glass-bg: rgba(24, 24, 34, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glare-opacity: 0.16;
+}
+
+/* Les pages existantes utilisent massivement ces utilitaires : on les
+   remappe en mode sombre sans toucher au JSX. */
+[data-theme="dark"] .bg-white { background-color: var(--grtk-surface) !important; }
+[data-theme="dark"] .bg-slate-50,
+[data-theme="dark"] .bg-slate-100,
+[data-theme="dark"] .bg-\[\#F6F7FB\],
+[data-theme="dark"] .bg-\[\#F0F5F9\] { background-color: var(--grtk-surface-2) !important; }
+[data-theme="dark"] .text-slate-900,
+[data-theme="dark"] .text-slate-800 { color: var(--grtk-text) !important; }
+[data-theme="dark"] .text-slate-700,
+[data-theme="dark"] .text-slate-600 { color: var(--grtk-text-2) !important; }
+[data-theme="dark"] .text-slate-500,
+[data-theme="dark"] .text-slate-400 { color: var(--grtk-text-3) !important; }
+[data-theme="dark"] .border-slate-200,
+[data-theme="dark"] .border-slate-300,
+[data-theme="dark"] .border-\[\#E7E7EF\] { border-color: var(--grtk-border) !important; }
+[data-theme="dark"] .divide-slate-100 { border-color: var(--grtk-border) !important; }
+[data-theme="dark"] .ring-violet-100 { --tw-ring-color: rgba(124, 58, 237, 0.25) !important; }
+[data-theme="dark"] .placeholder\:text-slate-400::placeholder { color: var(--grtk-text-3) !important; }
+[data-theme="dark"] .shadow-slate-200\/50,
+[data-theme="dark"] .shadow-slate-200\/60,
+[data-theme="dark"] .shadow-slate-200\/70 { box-shadow: var(--shadow-2) !important; }
+
+/* Surfaces colorées claires → variantes sombres lisibles, mêmes teintes. */
+[data-theme="dark"] .bg-violet-50,
+[data-theme="dark"] .bg-violet-100 { background-color: var(--grtk-violet-50) !important; }
+[data-theme="dark"] .bg-emerald-50 { background-color: rgba(5, 150, 105, 0.12) !important; }
+[data-theme="dark"] .bg-amber-50 { background-color: rgba(180, 83, 9, 0.12) !important; }
+[data-theme="dark"] .bg-cyan-50,
+[data-theme="dark"] .bg-sky-50 { background-color: rgba(2, 132, 199, 0.12) !important; }
+[data-theme="dark"] .bg-rose-50 { background-color: rgba(190, 18, 60, 0.12) !important; }
+[data-theme="dark"] .bg-pink-50 { background-color: rgba(219, 39, 119, 0.12) !important; }
+[data-theme="dark"] .bg-green-50 { background-color: rgba(5, 150, 105, 0.12) !important; }
+
+/* Textes accentués : on garde la famille violette, on augmente le contraste. */
+[data-theme="dark"] .text-violet-700,
+[data-theme="dark"] .text-violet-800,
+[data-theme="dark"] .text-violet-600 { color: #C084FC !important; }
+[data-theme="dark"] .text-emerald-700,
+[data-theme="dark"] .text-emerald-600 { color: #6EE7B7 !important; }
+[data-theme="dark"] .text-amber-700,
+[data-theme="dark"] .text-amber-800 { color: #FCD34D !important; }
+[data-theme="dark"] .text-cyan-700,
+[data-theme="dark"] .text-sky-700 { color: #7DD3FC !important; }
+[data-theme="dark"] .text-rose-600,
+[data-theme="dark"] .text-red-600,
+[data-theme="dark"] .text-red-700 { color: #FDA4AF !important; }
+[data-theme="dark"] .border-violet-200,
+[data-theme="dark"] .border-emerald-200,
+[data-theme="dark"] .border-amber-200,
+[data-theme="dark"] .border-cyan-200,
+[data-theme="dark"] .border-rose-200 { border-color: var(--grtk-border-strong) !important; }
+[data-theme="dark"] .divide-slate-200 { border-color: var(--grtk-border) !important; }
+[data-theme="dark"] .placeholder\:text-slate-500::placeholder { color: var(--grtk-text-3) !important; }
+
+/* ---------- Base ---------- */
+* { border-color: var(--grtk-border); }
+
 body {
-  background-color: var(--bg-app);
-  color: var(--text-primary);
+  background-color: var(--grtk-bg);
+  color: var(--grtk-text);
   font-family: var(--font-body);
   min-height: 100vh;
   margin: 0;
@@ -40,90 +193,114 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  transition: background-color var(--dur-base) var(--ease-in-out), color var(--dur-base) var(--ease-in-out);
 }
 
-.font-heading { font-family: var(--font-heading); }
+.font-heading,
+.font-display { font-family: var(--font-heading); }
 .font-mono { font-family: var(--font-mono); }
 .font-tabular { font-variant-numeric: tabular-nums; }
+.min-touch-target { min-height: 44px; min-width: 44px; }
 
-/* Carte blanche bordée — même rendu sur toutes les pages. */
+/* Champ de formulaire unique, lisible en clair comme en sombre. */
+.field {
+  width: 100%;
+  min-height: 46px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--grtk-border-strong);
+  background: var(--grtk-surface);
+  padding: 0.7rem 1rem;
+  font-size: 0.875rem;
+  color: var(--grtk-text);
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.field::placeholder { color: var(--grtk-text-3); }
+.field:focus {
+  border-color: var(--grtk-violet-600);
+  box-shadow: 0 0 0 3px var(--grtk-violet-100);
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--grtk-violet-600);
+  outline-offset: 2px;
+}
+
+/* ---------- Surfaces & contrôles ---------- */
 .neon-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: 20px;
-  transition: border-color 250ms ease, box-shadow 250ms ease, transform 250ms ease;
+  background: var(--grtk-surface);
+  border: 1px solid var(--grtk-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-1);
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
 }
 .neon-card:hover {
-  border-color: var(--border-accent);
-  box-shadow: 0 12px 32px -12px rgba(76, 29, 149, 0.18);
-  transform: translateY(-2px);
+  border-color: var(--grtk-violet-600);
+  box-shadow: var(--shadow-3);
+  transform: translateY(-3px);
 }
 
-/* Bouton principal violet — même rendu sur toutes les pages. */
+.glass-panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--shadow-2), var(--shadow-inset);
+}
+
 .btn-neon-purple {
-  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 55%, #5B21B6 100%);
+  background: linear-gradient(135deg, var(--grtk-violet-600) 0%, var(--grtk-violet-700) 55%, var(--grtk-violet-800) 100%);
   color: #FFFFFF;
   font-weight: 700;
-  border-radius: 9999px;
-  box-shadow: 0 4px 14px rgba(109, 40, 217, 0.22);
-  transition: filter 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 14px rgba(109, 40, 217, 0.22), var(--shadow-inset);
+  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), filter var(--dur-fast) ease;
 }
 .btn-neon-purple:hover {
   filter: brightness(1.06);
-  box-shadow: 0 8px 22px rgba(109, 40, 217, 0.28);
+  box-shadow: 0 8px 22px rgba(109, 40, 217, 0.28), var(--shadow-inset);
   transform: translateY(-1px);
 }
-.btn-neon-purple:active { transform: scale(0.98); }
+.btn-neon-purple:active { transform: translateY(1px) scale(0.985); }
 
-/* Bouton contour — même rendu sur toutes les pages. */
 .btn-glass-outline {
-  background: #FFFFFF;
-  backdrop-filter: none;
-  border: 1px solid var(--border-subtle);
-  color: var(--text-primary);
-  border-radius: 9999px;
-  transition: border-color 200ms ease, background 200ms ease, transform 200ms ease;
+  background: var(--grtk-surface);
+  border: 1px solid var(--grtk-border);
+  color: var(--grtk-text);
+  border-radius: var(--radius-pill);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  box-shadow: var(--shadow-1), var(--shadow-inset);
+  transition: border-color var(--dur-fast) ease, background var(--dur-fast) ease, transform var(--dur-fast) var(--ease-out);
 }
-.btn-glass-outline:hover {
-  background: var(--bg-muted);
-  border-color: var(--border-accent);
-  transform: translateY(-1px);
-}
+.btn-glass-outline:hover { border-color: var(--grtk-violet-600); background: var(--grtk-violet-50); transform: translateY(-1px); }
+.btn-glass-outline:active { transform: translateY(1px); }
 
 .text-neon-gradient {
-  background: linear-gradient(135deg, #111827 20%, #5B21B6 60%, #7C3AED 100%);
+  background: linear-gradient(135deg, var(--grtk-text) 20%, var(--grtk-violet-800) 60%, var(--grtk-violet-600) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
 .text-purple-gradient {
-  background: linear-gradient(135deg, #6D28D9 0%, #7C3AED 50%, #9333EA 100%);
+  background: linear-gradient(135deg, var(--grtk-violet-700) 0%, var(--grtk-violet-600) 50%, var(--grtk-violet-400) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
 .ribbon-banner {
-  background: linear-gradient(90deg, #FAF5FF 0%, #F3E8FF 50%, #FAF5FF 100%);
-  border-top: 1px solid var(--border-subtle);
-  border-bottom: 1px solid var(--border-subtle);
+  background: linear-gradient(90deg, var(--grtk-violet-50) 0%, var(--grtk-violet-100) 50%, var(--grtk-violet-50) 100%);
+  border-top: 1px solid var(--grtk-border);
+  border-bottom: 1px solid var(--grtk-border);
 }
 
-@keyframes glowPulse {
-  0%, 100% { opacity: 0.35; transform: scale(1); }
-  50% { opacity: 0.7; transform: scale(1.04); }
-}
-.ambient-glow { animation: glowPulse 6s ease-in-out infinite; }
-
-/* ---------- Billets 3D réalistes : orientation unique sur toutes les pages ---------- */
+/* ---------- Billet 3D — couches, lumière, reflets ---------- */
 .grtk-stage {
   position: relative;
-  perspective: 1600px;
-  perspective-origin: 50% 35%;
+  perspective: var(--perspective);
+  perspective-origin: var(--mx) var(--my);
 }
 
-/* Une seule direction pour tous les billets, partout. */
 .grtk-3d,
 .grtk-3d--left,
 .grtk-3d--flat,
@@ -131,13 +308,20 @@ body {
   position: relative;
   transform-style: preserve-3d;
   will-change: transform;
-  transform: rotateX(6deg) rotateY(-9deg) rotateZ(-1deg);
-  transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 700ms ease;
-  border-radius: 24px;
+  transform: rotateX(var(--rx)) rotateY(var(--ry)) rotateZ(-1deg);
+  transition: transform var(--dur-slow) var(--ease-out), box-shadow var(--dur-slow) var(--ease-out);
+  border-radius: var(--radius-2xl);
   box-shadow:
     0 2px 3px rgba(17, 24, 39, 0.06),
     0 18px 32px -14px rgba(17, 24, 39, 0.22),
     0 42px 70px -30px rgba(109, 40, 217, 0.28);
+}
+.grtk-3d[data-reactive="true"] {
+  transition: transform 90ms linear, box-shadow var(--dur-base) var(--ease-out);
+}
+.grtk-3d:hover {
+  transform: rotateX(calc(var(--rx) - 3deg)) rotateY(calc(var(--ry) + 4deg)) translateY(calc(var(--lift) * -1)) scale(1.01);
+  box-shadow: 0 4px 6px rgba(17, 24, 39, 0.07), 0 26px 46px -16px rgba(17, 24, 39, 0.24), 0 60px 90px -32px rgba(109, 40, 217, 0.32);
 }
 
 .grtk-3d::before,
@@ -148,21 +332,20 @@ body {
   border-radius: inherit;
   pointer-events: none;
 }
-
-/* Tranche carton : donne l'épaisseur réelle du billet. */
 .grtk-3d::before {
   transform: translateZ(-18px);
-  background: linear-gradient(160deg, var(--grtk-edge), #5B21B6 70%);
+  background: linear-gradient(160deg, var(--grtk-edge, var(--grtk-violet-600)), var(--grtk-violet-800) 70%);
   box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.08);
 }
-
-/* Reflet sur les bords supérieurs. */
 .grtk-3d::after {
   transform: translateZ(2px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.85),
     inset 0 -1px 0 rgba(17, 24, 39, 0.12),
     inset 1px 0 0 rgba(255, 255, 255, 0.6);
+}
+[data-theme="dark"] .grtk-3d::after {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -1px 0 rgba(0, 0, 0, 0.6);
 }
 
 .grtk-3d-edge {
@@ -173,16 +356,14 @@ body {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(17, 24, 39, 0.1));
   pointer-events: none;
 }
-
-.grtk-3d:hover {
-  transform: rotateX(2deg) rotateY(-3deg) rotateZ(0deg) translateY(-10px) scale(1.01);
-  box-shadow:
-    0 4px 6px rgba(17, 24, 39, 0.07),
-    0 26px 46px -16px rgba(17, 24, 39, 0.24),
-    0 60px 90px -32px rgba(109, 40, 217, 0.32);
+.grtk-3d-layer {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  transform: translateZ(1px);
+  pointer-events: none;
 }
 
-/* Perforation verticale entre le talon et le corps du billet. */
 .grtk-perforation {
   position: absolute;
   top: 0;
@@ -190,43 +371,32 @@ body {
   right: 256px;
   width: 2px;
   transform: translateZ(3px);
-  background: repeating-linear-gradient(
-    to bottom,
-    rgba(91, 33, 182, 0.45) 0 5px,
-    transparent 5px 11px
-  );
+  background: repeating-linear-gradient(to bottom, rgba(91, 33, 182, 0.45) 0 5px, transparent 5px 11px);
   opacity: 0.55;
   pointer-events: none;
 }
-
-/* Feuille holographique discrète. */
 .grtk-foil {
   position: absolute;
   inset: 0;
   border-radius: inherit;
   transform: translateZ(4px);
-  background: linear-gradient(
-    115deg,
-    transparent 32%,
-    rgba(109, 40, 217, 0.10) 46%,
-    rgba(168, 85, 247, 0.14) 50%,
-    transparent 64%
-  );
+  background: linear-gradient(115deg, transparent 32%, rgba(109, 40, 217, 0.10) 46%, rgba(168, 85, 247, 0.14) 50%, transparent 64%);
   mix-blend-mode: multiply;
   pointer-events: none;
 }
-
+[data-theme="dark"] .grtk-foil { mix-blend-mode: screen; }
 .grtk-sheen {
   position: absolute;
-  left: -30%;
+  left: calc(var(--mx, 50%) - 30%);
   top: -60%;
   height: 220%;
-  width: 40%;
+  width: 42%;
   transform: translateZ(5px) rotate(18deg);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, var(--glare-opacity)), transparent);
+  opacity: 0.75;
   pointer-events: none;
+  transition: left var(--dur-base) var(--ease-out), opacity var(--dur-base) ease;
 }
-
 .grtk-ground-shadow {
   position: absolute;
   left: 6%;
@@ -240,12 +410,92 @@ body {
   pointer-events: none;
 }
 
+/* Recto / verso du billet */
+.grtk-flip { perspective: var(--perspective); }
+.grtk-flip-inner {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 420ms var(--ease-in-out);
+}
+.grtk-flip[data-flipped="true"] .grtk-flip-inner { transform: rotateY(180deg); }
+.grtk-flip-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.grtk-flip-back { position: absolute; inset: 0; transform: rotateY(180deg); }
+
+/* ---------- Animations professionnelles ---------- */
+@keyframes glowPulse { 0%, 100% { opacity: 0.35; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.04); } }
+@keyframes revealUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes sweep { from { transform: translateX(-120%) rotate(18deg); } to { transform: translateX(320%) rotate(18deg); } }
+@keyframes badgeShine { 0%, 100% { box-shadow: 0 0 0 rgba(124, 58, 237, 0); } 50% { box-shadow: 0 0 18px rgba(124, 58, 237, 0.35); } }
+@keyframes popSuccess { 0% { transform: scale(0.8); opacity: 0; } 60% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes shakeError { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-5px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(3px); } }
+@keyframes skeletonShimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+@keyframes floatSoft { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes confettiFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 1; } 100% { transform: translateY(240px) rotate(540deg); opacity: 0; } }
+
+.ambient-glow { animation: glowPulse 6s ease-in-out infinite; }
+.animate-reveal { animation: revealUp var(--dur-slow) var(--ease-out) both; }
+.animate-sweep { animation: sweep 2.8s var(--ease-in-out) infinite; }
+.animate-badge-shine { animation: badgeShine 2.4s var(--ease-in-out) infinite; }
+.animate-pop { animation: popSuccess 320ms var(--ease-spring) both; }
+.animate-shake { animation: shakeError 300ms var(--ease-in-out); }
+.animate-float { animation: floatSoft 5s var(--ease-in-out) infinite; }
+.animate-confetti { animation: confettiFall 1200ms var(--ease-out) forwards; }
+
+.skeleton {
+  background: linear-gradient(90deg, var(--grtk-surface-2) 25%, var(--grtk-border) 50%, var(--grtk-surface-2) 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s linear infinite;
+  border-radius: var(--radius-md);
+}
+
+.magnetic-btn { transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-base) var(--ease-out); }
+.magnetic-btn:active { transform: scale(0.97); }
+
+.link-underline { position: relative; }
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 2px;
+  width: 100%;
+  background: var(--grtk-violet-600);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after { transform: scaleX(1); }
+
+/* Transitions de route (React View Transition / Framer Motion) */
+::view-transition { pointer-events: none; }
+::view-transition-old(root) { animation: 150ms ease-in both fadeOut; }
+::view-transition-new(root) { animation: 220ms ease-out both fadeIn; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-6px); } }
+
+/* ---------- Accessibilité : réduire les animations ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .grtk-3d, .grtk-3d:hover { transform: none !important; }
+  .grtk-sheen, .grtk-foil { display: none; }
+  ::view-transition-old(*), ::view-transition-new(*), ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
 @media (max-width: 767px) {
   .grtk-perforation { right: 0; top: auto; bottom: 0; left: 0; width: 100%; height: 2px; background: repeating-linear-gradient(to right, rgba(91,33,182,.45) 0 5px, transparent 5px 11px); }
 }
 
 @media print {
   .grtk-stage { perspective: none; }
-  .grtk-3d, .grtk-3d:hover { transform: none !important; box-shadow: none !important; }
+  .grtk-3d, .grtk-3d:hover, .grtk-flip-inner { transform: none !important; box-shadow: none !important; }
   .grtk-ground-shadow, .grtk-perforation, .grtk-foil, .grtk-sheen { display: none; }
 }

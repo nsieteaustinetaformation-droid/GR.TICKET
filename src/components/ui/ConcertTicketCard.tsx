@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-import { Mic2, QrCode as QrIcon } from "lucide-react";
+import { ImageIcon, Mic2, QrCode as QrIcon } from "lucide-react";
 
 export interface ConcertTicketCardProps {
   eventName?: string;
   category?: string;
   price?: string;
   ticketCode?: string;
+  imageUrl?: string | null;
   rotate?: string; // e.g. "-rotate-6", "rotate-3", "rotate-0"
   className?: string;
   onClick?: () => void;
@@ -19,6 +19,7 @@ export function ConcertTicketCard({
   category = "CONCERT PASS",
   price = "Prix à l'unité",
   ticketCode = "GR-89421-50284",
+  imageUrl = null,
   rotate = "-rotate-6",
   className = "",
   onClick,
@@ -43,15 +44,20 @@ export function ConcertTicketCard({
           ))}
         </div>
 
-        {/* IMAGE DE FOND FESTIVAL / CONCERT */}
-        <div className="relative h-64 w-full overflow-hidden bg-violet-50">
-          <Image
-            src="/images/ticket_bg.jpg"
-            alt="Concert stage crowd"
-            fill
-            className="object-cover object-center opacity-80 group-hover:scale-110 transition-transform duration-700"
-            priority
-          />
+        {/* IMAGE FOURNIE PAR L'ORGANISATEUR — sinon emplacement neutre, jamais une photo stock */}
+        <div className="relative h-64 w-full overflow-hidden bg-gradient-to-br from-violet-50 via-white to-violet-100">
+          {imageUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={imageUrl}
+              alt=""
+              className="h-full w-full object-cover object-center opacity-80 group-hover:scale-110 transition-transform duration-700"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
+              <ImageIcon className="h-10 w-10 text-violet-300" />
+            </div>
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-white/10" />
 
           {/* LOGO GRTK STAGE */}

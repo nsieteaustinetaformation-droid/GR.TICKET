@@ -23,6 +23,20 @@ export interface EventRow {
   commission_percent: number;
   payout_method: string | null;
   payout_phone: string | null;
+  // Internationalisation et GRTK (colonnes ajoutées de façon idempotente).
+  country_code?: string | null;
+  currency?: string | null;
+  time_zone?: string | null;
+  start_at_utc?: string | null;
+  locale?: string | null;
+  tax_rule_id?: string | null;
+  branding?: Record<string, unknown> | null;
+  guarantee_enabled?: boolean | null;
+  split_enabled?: boolean | null;
+  group_validation_mode?: string | null;
+  hold_hours?: number | null;
+  resale_cap_percent?: number | null;
+  installments_enabled?: boolean | null;
 }
 
 export interface TicketTypeRow {
@@ -90,6 +104,19 @@ export function eventToRow(event: EventItem): EventRow {
     commission_percent: event.commissionPercent ?? 10,
     payout_method: event.payoutMethod ?? null,
     payout_phone: event.payoutPhone ?? null,
+    country_code: event.countryCode ?? null,
+    currency: event.currency ?? null,
+    time_zone: event.timeZone ?? null,
+    start_at_utc: event.startAtUtc ?? null,
+    locale: event.locale ?? null,
+    tax_rule_id: event.taxRuleId ?? null,
+    branding: (event.branding ?? {}) as unknown as Record<string, unknown>,
+    guarantee_enabled: event.guaranteeEnabled ?? true,
+    split_enabled: event.splitEnabled ?? true,
+    group_validation_mode: event.groupValidationMode ?? "all_or_nothing",
+    hold_hours: event.holdHours ?? 24,
+    resale_cap_percent: event.resaleCapPercent ?? 1,
+    installments_enabled: event.installmentsEnabled ?? false,
   };
 }
 
@@ -117,6 +144,19 @@ export function eventFromRow(row: EventRow, ticketTypes: TicketType[]): EventIte
     commissionPercent: row.commission_percent ?? 10,
     payoutMethod: (row.payout_method as EventItem["payoutMethod"]) ?? undefined,
     payoutPhone: row.payout_phone ?? undefined,
+    countryCode: row.country_code ?? undefined,
+    currency: row.currency ?? undefined,
+    timeZone: row.time_zone ?? undefined,
+    startAtUtc: row.start_at_utc ?? undefined,
+    locale: row.locale ?? undefined,
+    taxRuleId: row.tax_rule_id ?? undefined,
+    branding: (row.branding ?? undefined) as unknown as EventItem["branding"],
+    guaranteeEnabled: row.guarantee_enabled ?? undefined,
+    splitEnabled: row.split_enabled ?? undefined,
+    groupValidationMode: (row.group_validation_mode as EventItem["groupValidationMode"]) ?? undefined,
+    holdHours: row.hold_hours ?? undefined,
+    resaleCapPercent: row.resale_cap_percent ?? undefined,
+    installmentsEnabled: row.installments_enabled ?? undefined,
     ticketTypes,
   };
 }

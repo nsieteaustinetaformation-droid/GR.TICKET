@@ -517,3 +517,81 @@ begin
   delete from public.tickets where holder_account_id = auth.uid()::text;
 end;
 $$;
+
+-- ============================================================================
+-- IMAGES — bucket public, avatar et galerie (bloc idempotent)
+-- ============================================================================
+
+-- Bucket public : les URL renvoyées par /api/v1/uploads sont directement lisibles.
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'grtk-images', 'grtk-images', true, 8388608,
+  array['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']::text[]
+)
+on conflict (id) do update set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "grtk images are publicly readable" on storage.objects;
+create policy "grtk images are publicly readable" on storage.objects
+  for select to anon, authenticated using (bucket_id = 'grtk-images');
+
+-- Le serveur upload avec la clé service_role (bypass RLS) et génère les chemins.
+-- Ces policies ne couvrent que les accès directs depuis le navigateur.
+drop policy if exists "authenticated users upload grtk images" on storage.objects;
+create policy "authenticated users upload grtk images" on storage.objects
+  for insert to authenticated with check (bucket_id = 'grtk-images');
+
+drop policy if exists "users delete their grtk images" on storage.objects;
+create policy "users delete their grtk images" on storage.objects
+  for delete to authenticated using (bucket_id = 'grtk-images');
+
+create table if not exists public.profiles (
+  id text primary key,
+  full_name text not null default '',
+  avatar_url text,
+  updated_at timestamptz not null default now()
+);
+
+alter table public.profiles add column if not exists avatar_url text;
+
+alter table public.profiles enable row level security;
+
+drop policy if exists "profiles are readable by everyone" on public.profiles;
+create policy "profiles are readable by everyone" on public.profiles
+  for select to anon, authenticated using (true);
+
+drop policy if exists "users manage their profile" on public.profiles;
+create policy "users manage their profile" on public.profiles
+  for all to authenticated
+  using (id = auth.uid()::text)
+  with check (id = auth.uid()::text);
+
+create table if not exists public.event_gallery (
+  id text primary key default gen_random_uuid()::text,
+  event_id text not null references public.events(id) on delete cascade,
+  url text not null,
+  position integer not null default 0,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists event_gallery_event_idx on public.event_gallery(event_id, position);
+
+alter table public.event_gallery enable row level security;
+
+drop policy if exists "gallery images are readable by everyone" on public.event_gallery;
+create policy "gallery images are readable by everyone" on public.event_gallery
+  for select to anon, authenticated using (true);
+
+drop policy if exists "owners manage their gallery" on public.event_gallery;
+create policy "owners manage their gallery" on public.event_gallery
+  for all to authenticated
+  using (exists (
+    select 1 from public.events e
+    where e.id = event_gallery.event_id and e.owner_id = auth.uid()::text
+  ))
+  with check (exists (
+    select 1 from public.events e
+    where e.id = event_gallery.event_id and e.owner_id = auth.uid()::text
+  ));

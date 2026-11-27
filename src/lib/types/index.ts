@@ -31,6 +31,8 @@ export interface EventItem {
   startTime: string;
   imageUrl: string;
   bannerUrl?: string;
+  /** Photos de l'événement (URL publiques Supabase ou data URL en mode démo). */
+  gallery?: string[];
   artistName: string;
   organizer: string;
   status: EventStatus;
@@ -198,3 +200,5 @@ export interface AuditLogEntry {
   ipAddress?: string;
   timestamp: string;
 }
+
+// `AppUser` (avec avatarUrl) est défini dans src/lib/auth.tsx.
