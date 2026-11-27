@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { fail, json, readJson } from "@/lib/api/respond";
+import { fail, json } from "@/lib/api/respond";
 import { getPaymentProvider } from "@/lib/payments/registry";
 import "@/lib/payments";
 import { getState } from "@/lib/server/state";
@@ -16,7 +16,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ pro
 
   const raw = await request.text();
   const signature = request.headers.get("x-grtk-signature") ?? "";
-  const secret = process.env.PAYMENT_WEBHOOK_SECRET ?? "demo-webhook-secret";
+  // Un secret par défaut rendrait le webhook publique : on refuse de traiter
+  // tant que le secret réel n'est pas configuré sur le serveur.
+  const secret = process.env.PAYMENT_WEBHOOK_SECRET?.trim();
+  if (!secret || secret === "demo-webhook-secret" || secret === "changez-moi") {
+    return fail("WEBHOOK_SECRET_NOT_CONFIGURED", 503);
+  }
   const expected = createHmac("sha256", secret).update(raw).digest("hex");
   const a = Buffer.from(expected);
   const b = Buffer.from(signature);

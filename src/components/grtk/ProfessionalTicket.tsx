@@ -109,7 +109,7 @@ export function ProfessionalTicket({ ticket, branding, localDate, venue, city, l
               ) : (
                 <TicketIcon className="h-8 w-8 text-[var(--grtk-primary)]" />
               )}
-              <span className="text-xs font-black uppercase tracking-[0.2em]">GRTK</span>
+              <span className="text-xs font-black uppercase tracking-[0.2em]">GR Ticket</span>
             </div>
             <GuaranteeBadge locale={l} compact />
           </div>
@@ -154,14 +154,14 @@ export function ProfessionalTicket({ ticket, branding, localDate, venue, city, l
           <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-md">
             {qr ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img ref={qrRef} src={qr} alt="QR dynamique GRTK" className="h-40 w-40" />
+              <img ref={qrRef} src={qr} alt="QR dynamique GR Ticket" className="h-40 w-40" />
             ) : (
               <div className="h-40 w-40 animate-pulse bg-slate-200" />
             )}
           </div>
           {error && <p className="text-center text-[10px] text-rose-600">{error}</p>}
           <p className="text-center text-[9px] uppercase leading-relaxed tracking-wider text-slate-500">
-            {l === "fr" ? "Présentez ce QR dans l'application GRTK. Une capture d'écran ne passe pas." : "Show this QR in the GRTK app. A screenshot will not work."}
+            {l === "fr" ? "Présentez ce QR dans l'application GR Ticket. Une capture d'écran ne passe pas." : "Show this QR in the GR Ticket app. A screenshot will not work."}
           </p>
         </div>
       </div>

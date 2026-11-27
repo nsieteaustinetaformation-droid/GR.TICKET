@@ -43,7 +43,7 @@ export function ShowcaseTicket3D({
           style={{ background: `linear-gradient(130deg, ${color}, #241559 75%)` }}
         >
           <div className="absolute -right-6 -top-10 h-32 w-32 rounded-full border-[16px] border-white/10" />
-          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/70">GRTK</p>
+          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/70">GR Ticket</p>
           <p className="mt-1 text-sm font-black uppercase leading-tight tracking-tight">{title}</p>
           <span className="mt-2 inline-block rounded-md bg-white/15 px-2 py-0.5 text-[8px] font-bold uppercase tracking-widest">
             {category}
@@ -88,7 +88,7 @@ export function ShowcaseTicket3D({
         </div>
 
         <div className="flex items-center justify-center gap-1.5 bg-emerald-50 py-2 text-[8px] font-black uppercase tracking-widest text-emerald-700">
-          <ShieldCheck className="h-3 w-3" /> Billet garanti GRTK
+          <ShieldCheck className="h-3 w-3" /> Billet garanti GR Ticket
         </div>
       </div>
     </RealisticTicket3D>

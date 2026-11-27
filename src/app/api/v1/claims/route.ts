@@ -13,6 +13,9 @@ interface Body {
 
 export async function POST(request: Request) {
   const body = await readJson<Body>(request);
+  // La décision automatique est réservée au serveur : un visiteur ne peut pas
+  // s'approuver lui-même en envoyant `autoDecide: true`.
+  if (body?.autoDecide === true) return fail("FORBIDDEN", 403);
   if (!body?.ticketId || !body.reason) return fail("TICKET_AND_REASON_REQUIRED");
 
   const created = createClaim({ ticketId: body.ticketId, reason: body.reason, photoUrl: body.photoUrl });

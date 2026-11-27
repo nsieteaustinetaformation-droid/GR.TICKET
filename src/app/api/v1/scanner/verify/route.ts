@@ -1,3 +1,4 @@
+import { requireApiAuth } from "@/lib/api/guard";
 import { fail, json, readJson } from "@/lib/api/respond";
 import { verifyScan } from "@/lib/domain/qr";
 
@@ -7,6 +8,9 @@ interface Body {
 }
 
 export async function POST(request: Request) {
+  const guard = await requireApiAuth("organizer");
+  if (guard instanceof Response) return guard;
+
   const body = await readJson<Body>(request);
   if (!body?.token) return fail("TOKEN_REQUIRED");
   const result = verifyScan(body.token, body.scannerId ?? "scanner-demo");

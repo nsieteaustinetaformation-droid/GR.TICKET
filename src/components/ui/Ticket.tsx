@@ -110,9 +110,9 @@ export function Ticket({
         {/* CORPS PRINCIPAL DU BILLET (Fond Noir Profond) */}
         <div className="relative flex-1 p-6 md:p-8 flex flex-col justify-between">
           
-          {/* Filigrane GRTK */}
+          {/* Filigrane GR Ticket */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 select-none pointer-events-none opacity-[0.03] text-8xl font-black font-display uppercase tracking-widest text-violet-700">
-            GRTK
+            GR Ticket
           </div>
 
           {/* En-tête du Billet */}
@@ -124,7 +124,7 @@ export function Ticket({
                 </div>
                 <div>
                   <span className="text-xs font-bold uppercase tracking-wider text-violet-700 block leading-none">
-                    GRTK
+                    GR Ticket
                   </span>
                   <span className="text-[10px] text-slate-500 uppercase tracking-widest">
                     Billetterie internationale

@@ -1,3 +1,4 @@
+import { requireApiAuth } from "@/lib/api/guard";
 import {
   EVENT_STEP_FIELDS,
   eventPublishSchema,
@@ -12,6 +13,9 @@ const ORDERED_FIELDS = [
 ];
 
 export async function POST(request: Request): Promise<Response> {
+  const guard = await requireApiAuth("organizer");
+  if (guard instanceof Response) return guard;
+
   let payload: unknown;
   try {
     payload = await request.json();

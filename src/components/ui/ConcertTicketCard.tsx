@@ -60,13 +60,13 @@ export function ConcertTicketCard({
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-white/10" />
 
-          {/* LOGO GRTK STAGE */}
+          {/* LOGO GR Ticket STAGE */}
           <div className="relative z-10 pt-6 px-5 flex flex-col items-center text-center">
             <div className="w-9 h-9 rounded-full bg-violet-100 border border-violet-200 flex items-center justify-center text-violet-700 shadow-sm mb-1">
               <Mic2 className="w-5 h-5" />
             </div>
             <span className="font-display tracking-widest text-xs uppercase text-violet-700 font-bold">
-              GRTK STAGE
+              GR Ticket STAGE
             </span>
           </div>
 
@@ -115,7 +115,7 @@ export function ConcertTicketCard({
           </div>
 
           <div className="flex items-center justify-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 rounded-lg py-2">
-            <QrIcon className="w-3 h-3" /> Billet garanti GRTK
+            <QrIcon className="w-3 h-3" /> Billet garanti GR Ticket
           </div>
         </div>
 

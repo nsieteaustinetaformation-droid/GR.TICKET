@@ -37,7 +37,7 @@ function Brand({ primaryColor }: { primaryColor: string }): JSX.Element {
       >
         <TicketIcon className="h-4 w-4" aria-hidden="true" />
       </span>
-      <span className="text-xs font-black uppercase tracking-[0.2em]">GRTK</span>
+      <span className="text-xs font-black uppercase tracking-[0.2em]">GR Ticket</span>
     </div>
   );
 }

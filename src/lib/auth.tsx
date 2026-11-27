@@ -1,6 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { DEMO_USER_STORAGE_KEY } from "@/lib/auth/constants";
+import { normalizeRole, type AccountRole } from "@/lib/auth/roles";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase/client";
 
 export interface AppUser {
@@ -9,6 +11,7 @@ export interface AppUser {
   fullName: string;
   phone: string;
   avatarUrl: string;
+  role: AccountRole;
 }
 
 export interface ProfileUpdate {
@@ -28,7 +31,24 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-const DEMO_KEY = "gr-ticket-demo-user";
+
+/** Enregistre aussi une session signée lisible par le serveur (voir /api/v1/auth/demo). */
+async function syncDemoCookie(user: AppUser | null): Promise<void> {
+  if (user) {
+    await fetch("/api/v1/auth/demo", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        email: user.email,
+        fullName: user.fullName,
+        phone: user.phone,
+        role: user.role,
+      }),
+    });
+  } else {
+    await fetch("/api/v1/auth/demo", { method: "DELETE" });
+  }
+}
 
 function demoUserFromEmail(email: string): AppUser {
   const name = email.split("@")[0]?.replace(/[._-]/g, " ") || "Organisateur";
@@ -38,6 +58,7 @@ function demoUserFromEmail(email: string): AppUser {
     fullName: name.charAt(0).toUpperCase() + name.slice(1),
     phone: "",
     avatarUrl: "",
+    role: "organizer",
   };
 }
 
@@ -47,14 +68,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!supabase) {
-      try {
-        const raw = window.localStorage.getItem(DEMO_KEY);
-        if (raw) setUser(JSON.parse(raw) as AppUser);
-      } catch {
-        // ignore
-      }
-      setLoading(false);
-      return;
+      // Différé d'un tick : évite un setState synchrone dans l'effet.
+      // La session signée du serveur est la source de vérité : un simple
+      // localStorage ne suffit pas à accéder aux espaces privés.
+      const timer = window.setTimeout(() => {
+        void (async () => {
+          try {
+            const res = await fetch("/api/v1/auth/session");
+            if (res.ok) {
+              const data = (await res.json()) as { user: AppUser };
+              setUser(data.user);
+              window.localStorage.setItem(DEMO_USER_STORAGE_KEY, JSON.stringify(data.user));
+            } else {
+              window.localStorage.removeItem(DEMO_USER_STORAGE_KEY);
+            }
+          } catch {
+            try {
+              const raw = window.localStorage.getItem(DEMO_USER_STORAGE_KEY);
+              if (raw) {
+                const restored = JSON.parse(raw) as AppUser;
+                setUser(restored);
+                void syncDemoCookie(restored);
+              }
+            } catch {
+              // ignore
+            }
+          } finally {
+            setLoading(false);
+          }
+        })();
+      }, 0);
+      return () => window.clearTimeout(timer);
     }
 
     let active = true;
@@ -68,6 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           fullName: String(sessionUser.user_metadata?.full_name ?? ""),
           phone: String(sessionUser.user_metadata?.phone ?? ""),
           avatarUrl: String(sessionUser.user_metadata?.avatar_url ?? ""),
+          role: normalizeRole(sessionUser.app_metadata?.role ?? sessionUser.user_metadata?.role),
         });
       }
       setLoading(false);
@@ -83,6 +128,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               fullName: String(sessionUser.user_metadata?.full_name ?? ""),
               phone: String(sessionUser.user_metadata?.phone ?? ""),
               avatarUrl: String(sessionUser.user_metadata?.avatar_url ?? ""),
+              role: normalizeRole(sessionUser.app_metadata?.role ?? sessionUser.user_metadata?.role),
             }
           : null
       );
@@ -105,7 +151,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (!supabase) {
           const next = demoUserFromEmail(email.trim());
-          window.localStorage.setItem(DEMO_KEY, JSON.stringify(next));
+          window.localStorage.setItem(DEMO_USER_STORAGE_KEY, JSON.stringify(next));
+          await syncDemoCookie(next);
           setUser(next);
           return;
         }
@@ -121,7 +168,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (!supabase) {
           const next = { ...demoUserFromEmail(email.trim()), fullName: fullName.trim(), phone: phone.trim() };
-          window.localStorage.setItem(DEMO_KEY, JSON.stringify(next));
+          window.localStorage.setItem(DEMO_USER_STORAGE_KEY, JSON.stringify(next));
+          await syncDemoCookie(next);
           setUser(next);
           return;
         }
@@ -139,6 +187,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             fullName: fullName.trim(),
             phone: phone.trim(),
             avatarUrl: "",
+            role: "organizer",
           });
         } else {
           throw new Error("Compte créé. Confirmez votre email avant de vous connecter.");
@@ -154,7 +203,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
 
         if (!supabase) {
-          window.localStorage.setItem(DEMO_KEY, JSON.stringify(next));
+          window.localStorage.setItem(DEMO_USER_STORAGE_KEY, JSON.stringify(next));
+          await syncDemoCookie(next);
           setUser(next);
           return;
         }
@@ -175,7 +225,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
       signOut: async () => {
         if (supabase) await supabase.auth.signOut();
-        window.localStorage.removeItem(DEMO_KEY);
+        window.localStorage.removeItem(DEMO_USER_STORAGE_KEY);
+        await syncDemoCookie(null);
         setUser(null);
       },
     }),

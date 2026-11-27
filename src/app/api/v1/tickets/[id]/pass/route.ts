@@ -1,3 +1,4 @@
+import { requireApiAuth } from "@/lib/api/guard";
 import { fail, json } from "@/lib/api/respond";
 import { getState } from "@/lib/server/state";
 
@@ -7,6 +8,9 @@ import { getState } from "@/lib/server/state";
  * faut configurer, sans jamais prétendre qu'un pass a été généré.
  */
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const guard = await requireApiAuth();
+  if (guard instanceof Response) return guard;
+
   const { id } = await params;
   const kind = new URL(request.url).searchParams.get("kind");
   const ticket = getState().tickets.get(id);

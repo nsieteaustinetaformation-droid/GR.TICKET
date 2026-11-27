@@ -318,7 +318,7 @@ function Cart() {
                 <FieldError message={errors.paymentMethod} />
                 <label className="flex items-start gap-3 rounded-xl border border-[var(--grtk-border)] p-4 text-xs">
                   <input id="field-accepted" type="checkbox" checked={accepted} onChange={(e) => { setAccepted(e.target.checked); setErrors((er) => ({ ...er, accepted: "" })); }} className="mt-0.5 h-4 w-4 accent-violet-600" />
-                  <span>J&apos;accepte les conditions d&apos;achat et la garantie GRTK : si mon billet ne passe pas, je suis remboursé.</span>
+                  <span>J&apos;accepte les conditions d&apos;achat et la garantie GR Ticket : si mon billet ne passe pas, je suis remboursé.</span>
                 </label>
                 <FieldError message={errors.accepted} />
                 <div className="flex gap-3">
@@ -372,7 +372,7 @@ function Cart() {
 
         {event.splitEnabled !== false && (
           <Reveal delay={120}>
-            <section className="rounded-2xl border border-[var(--grtk-border)] bg-[var(--grtk-surface)] p-6">
+            <section id="payer-a-plusieurs" className="rounded-2xl border border-[var(--grtk-border)] bg-[var(--grtk-surface)] p-6">
               <h2 className="flex items-center gap-2 font-heading text-sm font-bold uppercase tracking-wide">
                 <Users className="h-4 w-4 text-violet-600" aria-hidden /> Payer à plusieurs
               </h2>

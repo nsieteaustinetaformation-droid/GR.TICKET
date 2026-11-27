@@ -10,7 +10,7 @@ export default function Maquette3DPage() {
             ← Design system
           </Link>
           <span className="rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-violet-700">
-            GRTK · 3D réaliste
+            GR Ticket · 3D réaliste
           </span>
         </div>
 
@@ -38,7 +38,7 @@ export default function Maquette3DPage() {
             angle="flat"
           />
           <ShowcaseTicket3D
-            title="Concert Live GRTK"
+            title="Concert Live GR Ticket"
             category="Standard"
             holder="Bob Martin"
             date="22 août 2027 · 19:30"

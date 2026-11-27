@@ -1,3 +1,4 @@
+import { requireApiAuth } from "@/lib/api/guard";
 import { fail, json } from "@/lib/api/respond";
 import { buildDynamicQr } from "@/lib/domain/qr";
 import { getState } from "@/lib/server/state";
@@ -7,6 +8,9 @@ import { getState } from "@/lib/server/state";
  * Le token change à chaque fenêtre de 30 s et à chaque défi du scanner.
  */
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const guard = await requireApiAuth();
+  if (guard instanceof Response) return guard;
+
   const { id } = await params;
   const nonce = new URL(request.url).searchParams.get("nonce");
   if (!nonce) return fail("NONCE_REQUIRED");

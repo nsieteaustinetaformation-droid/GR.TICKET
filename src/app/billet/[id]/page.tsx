@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { QrCode, ShieldCheck } from "lucide-react";
+import { Check, Copy, MessageCircle, QrCode, Share2, ShieldCheck } from "lucide-react";
 import { ProfessionalTicket } from "@/components/grtk/ProfessionalTicket";
 import { RealisticTicket3D } from "@/components/grtk/RealisticTicket3D";
 import { GuaranteeBadge } from "@/components/grtk/GuaranteeBadge";
@@ -13,8 +13,9 @@ import { StatusFlash } from "@/components/motion/StatusFlash";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { getCountryConfig } from "@/lib/international/config";
 import "@/lib/international/seed";
-import { normalizeLocale } from "@/lib/international/messages";
+import { normalizeLocale, translate } from "@/lib/international/messages";
 import { formatInZone } from "@/lib/international/time";
+import { smsUrl, ticketLink, ticketShareMessage, whatsappUrl } from "@/lib/sharing";
 import { getEventById, restoreLocalEvents } from "@/lib/store/events";
 import type { EventItem, GrtkTicket } from "@/lib/types";
 
@@ -35,7 +36,7 @@ function TicketBack({ ticket, eventTitle, localDate }: { ticket: GrtkTicket; eve
       <div className="flex items-center gap-3 rounded-xl bg-violet-50 p-4">
         <QrCode className="h-6 w-6 shrink-0 text-violet-700" aria-hidden />
         <p className="text-[11px] leading-relaxed text-violet-900">
-          Présentez le QR dynamique depuis l&apos;application GRTK. Il change toutes les 30 secondes : une capture d&apos;écran ne passe pas.
+          Présentez le QR dynamique depuis l&apos;application GR Ticket. Il change toutes les 30 secondes : une capture d&apos;écran ne passe pas.
         </p>
       </div>
       <GuaranteeBadge locale="fr" compact withTooltip />
@@ -48,6 +49,7 @@ function TicketView() {
   const [ticket, setTicket] = useState<GrtkTicket | null>(null);
   const [event, setEvent] = useState<EventItem | null>(null);
   const [transferTo, setTransferTo] = useState("");
+  const [copied, setCopied] = useState(false);
   const [flash, setFlash] = useState<Flash | null>(null);
 
   useEffect(() => {
@@ -108,6 +110,21 @@ function TicketView() {
     );
   }
 
+  const link = ticketLink(ticket.id);
+  const shareMessage = ticketShareMessage({
+    locale,
+    eventTitle: ticket.eventTitle,
+    holderName: ticket.holderName,
+    code: ticket.id.slice(0, 12).toUpperCase(),
+    link,
+  });
+
+  async function copyTicketLink() {
+    await navigator.clipboard.writeText(link);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1600);
+  }
+
   return (
     <main className="min-h-screen bg-[var(--grtk-bg)] px-4 py-10 text-[var(--grtk-text)]">
       <div className="mx-auto max-w-3xl space-y-6">
@@ -131,10 +148,44 @@ function TicketView() {
           />
         </RealisticTicket3D>
 
-        <Reveal>
+        <Reveal delay={60}>
+          <section className="rounded-2xl border border-[var(--grtk-border)] bg-[var(--grtk-surface)] p-5 shadow-sm">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--grtk-text-2)]">
+              Envoyer le billet
+            </h2>
+            <p className="mt-1 text-xs text-[var(--grtk-text-3)]">
+              Le message est déjà rédigé avec le lien du billet. La photo apparaît dans l&apos;aperçu du lien.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                onClick={() => void copyTicketLink()}
+                className="magnetic-btn inline-flex items-center gap-1.5 rounded-lg border border-[var(--grtk-border)] px-3 py-2 text-[10px] font-bold uppercase hover:border-violet-600"
+              >
+                {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" aria-hidden /> : <Copy className="h-3.5 w-3.5" aria-hidden />}
+                {copied ? translate(locale, "share.copied") : translate(locale, "share.copyLink")}
+              </button>
+              <a
+                href={whatsappUrl(shareMessage)}
+                target="_blank"
+                rel="noreferrer"
+                className="magnetic-btn inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-[10px] font-bold uppercase text-white hover:bg-emerald-700"
+              >
+                <MessageCircle className="h-3.5 w-3.5" aria-hidden /> {translate(locale, "share.whatsapp")}
+              </a>
+              <a
+                href={smsUrl(shareMessage)}
+                className="magnetic-btn inline-flex items-center gap-1.5 rounded-lg border border-[var(--grtk-border)] px-3 py-2 text-[10px] font-bold uppercase hover:border-violet-600"
+              >
+                <Share2 className="h-3.5 w-3.5" aria-hidden /> {translate(locale, "share.sms")}
+              </a>
+            </div>
+          </section>
+        </Reveal>
+
+        <Reveal delay={120}>
           <section className="rounded-2xl border border-[var(--grtk-border)] bg-[var(--grtk-surface)] p-5 text-sm shadow-sm">
             <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--grtk-text-2)]">Transférer le billet</h2>
-            <p className="mt-1 text-xs text-[var(--grtk-text-3)]">Transfert uniquement via GRTK, au prix d&apos;origine. L&apos;ancien QR est invalidé.</p>
+            <p className="mt-1 text-xs text-[var(--grtk-text-3)]">Transfert uniquement via GR Ticket, au prix d&apos;origine. L&apos;ancien QR est invalidé.</p>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row">
               <input
                 value={transferTo}

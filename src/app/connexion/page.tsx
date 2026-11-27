@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, ShieldCheck, Ticket as TicketIcon } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
+import { BrandMark } from "@/components/system/BrandMark";
 import { FieldError } from "@/components/system/FieldError";
 import { RealisticTicket3D } from "@/components/grtk/RealisticTicket3D";
 import { HeroTicket } from "@/components/grtk/HeroTicket";
@@ -28,6 +29,7 @@ export default function ConnexionPage() {
   const router = useRouter();
   const { signIn, signUp, isDemo, user } = useAuth();
   const [mode, setMode] = useState<Mode>("login");
+  const [nextPath, setNextPath] = useState<string | null>(null);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -37,8 +39,19 @@ export default function ConnexionPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (user) router.replace("/dashboard");
-  }, [user, router]);
+    // Retour à la page demandée après connexion (validation du chemin local).
+    const timer = window.setTimeout(() => {
+      const params = new URLSearchParams(window.location.search);
+      const requested = params.get("next");
+      setNextPath(requested && requested.startsWith("/") && !requested.startsWith("//") ? requested : "/dashboard");
+      if (params.get("mode") === "signup") setMode("signup");
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (user && nextPath) router.replace(nextPath);
+  }, [user, nextPath, router]);
 
   const validation = mode === "signup"
     ? validateAuth({ fullName, email, password, phone: phone || undefined })
@@ -70,7 +83,7 @@ export default function ConnexionPage() {
       if (mode === "signup") await signUp(fullName, phone, email, password);
       else await signIn(email, password);
       setFlash({ kind: "success", message: "Connexion réussie. Redirection…" });
-      router.replace("/dashboard");
+      router.replace(nextPath ?? "/dashboard");
     } catch (err) {
       setFlash({ kind: "error", message: err instanceof Error ? err.message : "Une erreur est survenue. Réessayez." });
     } finally {
@@ -83,15 +96,7 @@ export default function ConnexionPage() {
       <section className="flex items-center justify-center px-4 py-10 sm:px-8">
         <div className="w-full max-w-md space-y-6">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-violet-700 text-white">
-                <TicketIcon className="h-5 w-5" aria-hidden />
-              </div>
-              <div>
-                <p className="font-heading font-black uppercase tracking-tight">GRTK</p>
-                <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--grtk-text-3)]">Billetterie internationale</p>
-              </div>
-            </div>
+            <BrandMark />
             <ThemeToggle compact />
           </div>
 

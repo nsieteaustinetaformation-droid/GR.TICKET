@@ -218,7 +218,7 @@ function DashboardInner() {
                 <p className="mt-1 text-lg font-black">{moneyFor(totalRevenue)}</p>
               </div>
               <div>
-                <p className="text-[11px] uppercase text-[var(--grtk-text-3)]">Commission GRTK ({DEFAULT_COMMISSION_PERCENT} %)</p>
+                <p className="text-[11px] uppercase text-[var(--grtk-text-3)]">Commission GR Ticket ({DEFAULT_COMMISSION_PERCENT} %)</p>
                 <p className="mt-1 text-lg font-black text-rose-700">− {moneyFor(commission)}</p>
               </div>
               <div>

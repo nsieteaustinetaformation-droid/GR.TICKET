@@ -42,7 +42,7 @@ export default function HowItWorksPage(): JSX.Element {
 
         <header className="mt-8 rounded-[var(--radius-2xl)] border border-[var(--grtk-border)] bg-[var(--grtk-surface)] p-6 sm:p-9">
           <span className="inline-flex rounded-full border border-[var(--grtk-violet-100)] bg-[var(--grtk-violet-50)] px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--grtk-violet-700)]">
-            GRTK
+            GR Ticket
           </span>
           <h1 className="mt-4 font-heading text-4xl font-black uppercase tracking-tight sm:text-5xl">
             {translate(LOCALE, "how.title")}

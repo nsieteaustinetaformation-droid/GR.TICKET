@@ -61,7 +61,7 @@ export default function DesignSystemPage() {
         <div>
           <div className="flex items-center gap-3">
             <span className="rounded-full border border-violet-200 bg-violet-50 px-3 py-1 font-mono text-xs font-semibold uppercase tracking-wider text-violet-700">
-              GRTK v1.0
+              GR Ticket v1.0
             </span>
             <span className="font-mono text-xs text-slate-500">
               WCAG AA Compliant
@@ -79,7 +79,7 @@ export default function DesignSystemPage() {
         {/* ACCÈS RAPIDE */}
         <div className="flex items-center gap-3">
           <span className="rounded-full border border-violet-200 bg-white px-3 py-1 font-mono text-xs font-semibold text-violet-700 shadow-sm">
-            Thème clair GRTK
+            Thème clair GR Ticket
           </span>
           <Link href="/maquette-3d">
             <Button variant="outline" size="sm" rightIcon={<ArrowRight className="h-4 w-4" />}>
@@ -183,7 +183,7 @@ export default function DesignSystemPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               <p className="font-display text-3xl font-black uppercase text-slate-900">
-                FESTIVAL GRTK LIVE 2026
+                FESTIVAL GR Ticket LIVE 2026
               </p>
               <p className="text-xs text-slate-500">
                 Utilisé pour l'identité visuelle scénique, les affiches, les titres de billets et les en-têtes.
@@ -397,7 +397,7 @@ export default function DesignSystemPage() {
               <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                 <div className="flex justify-between text-xs text-slate-500">
                   <span>Événement :</span>
-                  <span className="font-bold text-slate-900">GRTK LIVE CONCERT</span>
+                  <span className="font-bold text-slate-900">GR Ticket LIVE CONCERT</span>
                 </div>
                 <div className="flex justify-between text-xs text-slate-500">
                   <span>Catégorie :</span>
@@ -502,13 +502,13 @@ export default function DesignSystemPage() {
         </Table>
       </section>
 
-      {/* SECTION 9 : LE BILLET D'EXCEPTION GRTK */}
+      {/* SECTION 9 : LE BILLET D'EXCEPTION GR Ticket */}
       <section className="space-y-6 pt-4">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <div>
             <h2 className="flex items-center gap-2 font-display text-3xl font-bold uppercase tracking-wide text-slate-900">
               <TicketIcon className="h-6 w-6 text-violet-600" />
-              9. Le Billet d'Exception « GRTK »
+              9. Le Billet d'Exception « GR Ticket »
             </h2>
             <p className="text-xs text-slate-500">
               Corps blanc textile, talon violet détachable avec QR signé HMAC, code Crockford anti-ambiguïté, filigrane du label.
@@ -555,7 +555,7 @@ export default function DesignSystemPage() {
               ★ Format Pass Concert 3D (Éditorial)
             </span>
             <ConcertTicketCard
-              eventName="GRTK LIVE PASS"
+              eventName="GR Ticket LIVE PASS"
               category="VIP ALL-ACCESS"
               price={money(25000)}
               ticketCode={testTicketCode}
@@ -569,7 +569,7 @@ export default function DesignSystemPage() {
             </span>
             <Ticket
               ticketCode={testTicketCode}
-              eventName="GRTK AFRO-FUSION NIGHT"
+              eventName="GR Ticket AFRO-FUSION NIGHT"
               category="VIP"
               price={25000}
               eventDate="2026-11-28T20:30:00+01:00"
@@ -590,7 +590,7 @@ export default function DesignSystemPage() {
       {/* PIED DE PAGE DESIGN SYSTEM */}
       <footer className="space-y-2 border-t border-slate-200 pt-10 text-center text-xs text-slate-500">
         <p className="font-display text-sm font-bold uppercase tracking-widest text-violet-700">
-          GRTK • BILLETTERIE INTERNATIONALE
+          GR Ticket • BILLETTERIE INTERNATIONALE
         </p>
         <p>
           Conception UI/UX sur mesure • Blanc & Violet Haut Contraste • Conformité WCAG AA (4.5:1 minimum)

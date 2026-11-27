@@ -142,7 +142,7 @@ function EventView() {
                 </MagneticButton>
                 {event.splitEnabled !== false && (
                   <button
-                    onClick={() => router.push(`/groupe/nouveau?event=${event.id}`)}
+                    onClick={() => router.push(`/panier?event=${event.id}#payer-a-plusieurs`)}
                     className="magnetic-btn inline-flex min-touch-target items-center gap-2 rounded-xl border border-[var(--grtk-border)] bg-[var(--grtk-surface)] px-5 py-3 text-xs font-bold uppercase tracking-wider hover:border-violet-600 hover:text-violet-700"
                   >
                     <Users className="h-4 w-4" aria-hidden /> {translate(resolvedLocale, "event.split")}

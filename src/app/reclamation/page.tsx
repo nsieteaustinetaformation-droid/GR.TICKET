@@ -74,7 +74,7 @@ function ClaimForm() {
               <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50"><ShieldCheck className="h-6 w-6 text-emerald-700" aria-hidden /></span>
               <GuaranteeBadge locale="fr" withTooltip />
             </div>
-            <h1 className="mt-4 font-heading text-3xl font-black uppercase tracking-tight">Garantie GRTK</h1>
+            <h1 className="mt-4 font-heading text-3xl font-black uppercase tracking-tight">Garantie GR Ticket</h1>
             <p className="mt-2 text-sm text-[var(--grtk-text-2)]">
               Ton billet entre à la porte, sinon tu es remboursé. Décrivez le problème : nous vérifions le scan et le statut du billet.
             </p>

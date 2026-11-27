@@ -15,9 +15,9 @@ import { GuaranteeBadge } from "@/components/grtk/GuaranteeBadge";
 import { translate } from "@/lib/international/messages";
 
 export const metadata: Metadata = {
-  title: "Garantie GRTK",
+  title: "Garantie GR Ticket",
   description:
-    "Conditions de la garantie GRTK : QR dynamique, anti-capture, double scan, réclamation et remboursement.",
+    "Conditions de la garantie GR Ticket : QR dynamique, anti-capture, double scan, réclamation et remboursement.",
 };
 
 const SUPPORT_EMAIL = "support@gr-ticket.com";
@@ -54,7 +54,7 @@ export default function GuaranteePage(): JSX.Element {
 
         <header className="mt-8 rounded-[var(--radius-2xl)] border border-emerald-200 bg-emerald-50/60 p-6 sm:p-9">
           <span className="inline-flex rounded-full border border-[var(--grtk-violet-100)] bg-[var(--grtk-violet-50)] px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-[var(--grtk-violet-700)]">
-            GRTK
+            GR Ticket
           </span>
           <h1 className="mt-4 font-heading text-4xl font-black uppercase tracking-tight sm:text-5xl">
             {translate(LOCALE, "guarantee.title")}

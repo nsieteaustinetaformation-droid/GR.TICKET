@@ -1,3 +1,4 @@
+import { requireApiAuth } from "@/lib/api/guard";
 import { fail, json, readJson } from "@/lib/api/respond";
 import { decideClaim } from "@/lib/domain/claims";
 import type { GuaranteePolicy } from "@/lib/domain/claims";
@@ -11,6 +12,9 @@ interface Body {
 }
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const guard = await requireApiAuth("admin");
+  if (guard instanceof Response) return guard;
+
   const { id } = await params;
   const body = await readJson<Body>(request);
   if (typeof body?.approved !== "boolean") return fail("APPROVED_REQUIRED");

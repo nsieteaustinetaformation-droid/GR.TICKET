@@ -85,7 +85,7 @@ function CommissionWizard() {
                   <p className="mt-1 font-heading text-lg font-black">{money(gross)}</p>
                 </div>
                 <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4">
-                  <p className="text-[11px] uppercase text-rose-700">Commission GRTK ({DEFAULT_COMMISSION_PERCENT} %)</p>
+                  <p className="text-[11px] uppercase text-rose-700">Commission GR Ticket ({DEFAULT_COMMISSION_PERCENT} %)</p>
                   <p className="mt-1 font-heading text-lg font-black text-rose-700">− {money(commission)}</p>
                 </div>
                 <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">

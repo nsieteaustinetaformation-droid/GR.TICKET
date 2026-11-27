@@ -2,15 +2,22 @@ import type { Metadata, Viewport } from "next";
 import { SupabaseBootstrap } from "@/components/system/SupabaseBootstrap";
 import { ThemeProvider } from "@/components/system/ThemeProvider";
 import { AuthProvider } from "@/lib/auth";
+import { getAppUrl } from "@/lib/app-url";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(getAppUrl()),
   title: {
-    template: "%s | GRTK",
-    default: "GRTK — Billetterie internationale, billets garantis et paiement à plusieurs",
+    template: "%s | GR Ticket",
+    default: "GR Ticket — Billetterie internationale, billets garantis et paiement à plusieurs",
   },
   description:
-    "Plateforme internationale de billetterie : événements dans leur devise et fuseau, billets garantis GRTK, QR dynamique et paiement à plusieurs.",
+    "Plateforme internationale de billetterie : événements dans leur devise et fuseau, billets garantis GR Ticket, QR dynamique et paiement à plusieurs.",
+  applicationName: "GR Ticket",
+  openGraph: {
+    siteName: "GR Ticket",
+    type: "website",
+  },
   icons: {
     icon: "/favicon.ico",
   },

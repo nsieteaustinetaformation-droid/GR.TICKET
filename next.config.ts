@@ -11,11 +11,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  async redirects() {
-    return [
-      { source: "/", destination: "/dashboard", permanent: false },
-    ];
-  },
+  // L'accueil est public : aucune redirection automatique vers /dashboard.
   cacheComponents: true,
   partialPrefetching: true,
   experimental: {

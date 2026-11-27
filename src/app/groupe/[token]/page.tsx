@@ -17,6 +17,7 @@ import { getCountryConfig } from "@/lib/international/config";
 import "@/lib/international/seed";
 import { paymentMethodLabel, translate, type Locale } from "@/lib/international/messages";
 import { formatMoney } from "@/lib/international/money";
+import { groupLink, paymentInviteMessage, paymentLink, smsUrl, whatsappUrl } from "@/lib/sharing";
 import type { GroupPayment, GroupShare } from "@/lib/types";
 
 interface GroupData {
@@ -44,6 +45,7 @@ function GroupView() {
   const [busy, setBusy] = useState<string | null>(null);
   const [flash, setFlash] = useState<{ kind: "success" | "error"; message: string } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedShare, setCopiedShare] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/v1/groups/${token}`);
@@ -75,8 +77,14 @@ function GroupView() {
   const defaultMethod = paymentMethods[0];
   const paid = shares.filter((s) => s.status === "paid").length;
   const progress = shares.length ? Math.round((paid / shares.length) * 100) : 0;
-  const link = typeof window !== "undefined" ? window.location.href : "";
-  const whatsapp = `https://wa.me/?text=${encodeURIComponent(translate(locale, "split.invite", { name: group.initiatorName, link }))}`;
+  const link = groupLink(token);
+  const groupMessage = translate(locale, "share.group.message", {
+    name: group.initiatorName,
+    event: group.eventTitle,
+    link,
+  });
+  const whatsapp = whatsappUrl(groupMessage);
+  const smsLink = smsUrl(translate(locale, "split.sms", { link }));
 
   async function pay(share: GroupShare) {
     const name = (names[share.id] ?? "").trim();
@@ -120,6 +128,12 @@ function GroupView() {
     window.setTimeout(() => setCopied(false), 1600);
   }
 
+  async function copyPaymentLink(shareId: string) {
+    await navigator.clipboard.writeText(paymentLink(token, shareId));
+    setCopiedShare(shareId);
+    window.setTimeout(() => setCopiedShare(null), 1600);
+  }
+
   return (
     <main className="min-h-screen bg-[var(--grtk-bg)] px-4 py-10 text-[var(--grtk-text)]">
       <div className="mx-auto max-w-4xl space-y-6">
@@ -159,7 +173,7 @@ function GroupView() {
                 {copied ? "Lien copié" : "Copier le lien"}
               </button>
               <a href={whatsapp} target="_blank" rel="noreferrer" className="magnetic-btn inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-[10px] font-bold uppercase text-white hover:bg-emerald-700"><MessageCircle className="h-3.5 w-3.5" aria-hidden /> WhatsApp</a>
-              <a href={`sms:?body=${encodeURIComponent(translate(locale, "split.sms", { link }))}`} className="magnetic-btn inline-flex items-center gap-1.5 rounded-lg border border-[var(--grtk-border)] px-3 py-2 text-[10px] font-bold uppercase hover:border-violet-600"><Share2 className="h-3.5 w-3.5" aria-hidden /> SMS</a>
+              <a href={smsLink} className="magnetic-btn inline-flex items-center gap-1.5 rounded-lg border border-[var(--grtk-border)] px-3 py-2 text-[10px] font-bold uppercase hover:border-violet-600"><Share2 className="h-3.5 w-3.5" aria-hidden /> SMS</a>
             </div>
           </section>
         </Reveal>
@@ -206,6 +220,30 @@ function GroupView() {
                     >
                       {busy === share.id ? "Paiement en cours…" : "Payer ma part"}
                     </button>
+                    <div className="flex flex-wrap gap-2 sm:col-span-2">
+                      <button
+                        onClick={() => void copyPaymentLink(share.id)}
+                        className="magnetic-btn inline-flex items-center gap-1.5 rounded-lg border border-[var(--grtk-border)] px-3 py-2 text-[10px] font-bold uppercase hover:border-violet-600"
+                      >
+                        {copiedShare === share.id ? <Check className="h-3.5 w-3.5 text-emerald-600" aria-hidden /> : <Copy className="h-3.5 w-3.5" aria-hidden />}
+                        {copiedShare === share.id ? translate(locale, "share.copied") : translate(locale, "share.paymentLink")}
+                      </button>
+                      <a
+                        href={whatsappUrl(paymentInviteMessage({
+                          locale,
+                          name: names[share.id]?.trim() || "à tous",
+                          initiator: group.initiatorName,
+                          amount: formatMoney(share.amountMinor, group.currency, locale),
+                          eventTitle: group.eventTitle,
+                          link: paymentLink(token, share.id),
+                        }))}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="magnetic-btn inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-[10px] font-bold uppercase text-white hover:bg-emerald-700"
+                      >
+                        <MessageCircle className="h-3.5 w-3.5" aria-hidden /> {translate(locale, "share.whatsapp")}
+                      </a>
+                    </div>
                   </div>
                 )}
                 {share.ticketId && (

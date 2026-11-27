@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
+import { requireApiAuth } from "@/lib/api/guard";
 import {
   ACCEPTED_IMAGE_TYPES,
   IMAGE_BUCKET,
@@ -47,6 +48,9 @@ function readSupabaseConfig(): SupabaseConfig | null {
  * Supabase Storage (bucket `grtk-images`, voir `supabase/schema.sql`).
  */
 export async function POST(request: Request): Promise<Response> {
+  const guard = await requireApiAuth("organizer");
+  if (guard instanceof Response) return guard;
+
   let form: FormData;
   try {
     form = await request.formData();

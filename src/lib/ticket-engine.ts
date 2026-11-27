@@ -1,4 +1,5 @@
 import type { Order, Ticket, TicketType, EventItem, PaymentMethod } from '@/lib/types';
+import { getAppUrl } from './app-url';
 
 const CRB = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 
@@ -79,7 +80,7 @@ export function createOrderFromPurchase(params: {
 
 export function buildWhatsAppMessage(ticket: Ticket): string {
   const lines = [
-    '** BILLET OFFICIEL GRTK — GARANTI **',
+    '** BILLET OFFICIEL GR TICKET — GARANTI **',
     '',
     'Evenement: ' + ticket.eventTitle,
     'Lieu: ' + ticket.eventVenue,
@@ -90,7 +91,7 @@ export function buildWhatsAppMessage(ticket: Ticket): string {
     'Statut: VALIDE',
     '',
     'Conservez ce message — il servira au controle d entree.',
-    'Billet et QR dynamique : ' + (process.env.NEXT_PUBLIC_APP_URL ?? 'https://gr-ticket-theta.vercel.app') + '/billet/' + ticket.id,
+    'Billet et QR dynamique : ' + getAppUrl() + '/billet/' + ticket.id,
   ];
   return lines.join('\n');
 }

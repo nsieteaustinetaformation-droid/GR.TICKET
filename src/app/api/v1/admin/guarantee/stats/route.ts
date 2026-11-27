@@ -1,3 +1,4 @@
+import { requireApiAuth } from "@/lib/api/guard";
 import { json } from "@/lib/api/respond";
 import { guaranteeStats } from "@/lib/domain/claims";
 import { getAuditLog } from "@/lib/server/audit";
@@ -6,6 +7,9 @@ import { getCountryConfig } from "@/lib/international/config";
 import "@/lib/international/seed";
 
 export async function GET() {
+  const guard = await requireApiAuth("admin");
+  if (guard instanceof Response) return guard;
+
   const state = getState();
   const firstClaim = [...state.claims.values()][0];
   const ticket = firstClaim ? state.tickets.get(firstClaim.ticketId) : undefined;

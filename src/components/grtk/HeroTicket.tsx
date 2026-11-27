@@ -15,7 +15,7 @@ export function HeroTicket(): JSX.Element {
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-violet-800 text-white">
             <TicketIcon className="h-4 w-4" aria-hidden />
           </span>
-          <span className="font-heading text-sm font-black uppercase tracking-[0.2em]">GRTK</span>
+          <span className="font-heading text-sm font-black uppercase tracking-[0.2em]">GR Ticket</span>
         </div>
         <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[9px] font-bold uppercase tracking-wider text-emerald-700">
           <ShieldCheck className="h-3 w-3" aria-hidden /> Billet garanti
