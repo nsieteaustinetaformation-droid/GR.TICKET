@@ -45,18 +45,12 @@ export function Badge({
   };
 
   const variantStyles: Record<BadgeVariant, string> = {
-    success:
-      "bg-[var(--state-success-bg)] text-[var(--state-success)] border border-[var(--state-success)]",
-    alert:
-      "bg-[var(--state-alert-bg)] text-[var(--state-alert)] border border-[var(--state-alert)]",
-    error:
-      "bg-[var(--state-error-bg)] text-[var(--state-error)] border border-[var(--state-error)]",
-    info:
-      "bg-[var(--state-info-bg)] text-[var(--state-info)] border border-[var(--state-info)]",
-    gold:
-      "bg-[var(--gold-subtle)] text-[var(--gold-primary)] border border-[var(--gold-primary)]",
-    neutral:
-      "bg-[var(--bg-surface-elevated)] text-[var(--text-secondary)] border border-[var(--border-app)]",
+    success: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    alert: "bg-amber-50 text-amber-700 border border-amber-200",
+    error: "bg-rose-50 text-rose-700 border border-rose-200",
+    info: "bg-sky-50 text-sky-700 border border-sky-200",
+    gold: "bg-violet-50 text-violet-700 border border-violet-200",
+    neutral: "bg-slate-50 text-slate-600 border border-slate-200",
   };
 
   const sizeStyles = {

@@ -111,9 +111,11 @@ curl -X POST /api/v1/scanner/verify -H 'content-type: application/json' -d '{"to
 
 ---
 
-## Maquette 3D réaliste
+## Design blanc et maquette 3D réaliste
 
-- `/maquette-3d` : aperçu du rendu (fond clair, trois billets inclinés, carton épais, reflet holographique, ombre portée et talon perforé).
+- Toutes les pages utilisent le même thème blanc : fond `#FFFFFF`, cartes blanches bordées `slate-200`, texte `slate-900`, accents violets. Aucune page ne repasse en mode sombre.
+- `/maquette-3d` : aperçu du rendu (trois billets, carton épais, reflet holographique, ombre portée et talon perforé).
+- Tous les billets 3D sont orientés dans le **même sens** : une seule transformation est définie dans `src/app/globals.css` pour `.grtk-3d` et ses variantes `left`, `flat` et `right`.
 - Le vrai billet (`/billet/:id`) utilise le même habillage via `RealisticTicket3D` ; le QR dynamique et les actions PNG/PDF/Wallet restent identiques.
 - La couleur de la tranche suit `event.branding.primaryColor` : aucun style n'est figé par événement.
 

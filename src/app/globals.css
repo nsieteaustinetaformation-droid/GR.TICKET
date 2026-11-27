@@ -2,26 +2,28 @@
 @import "tailwindcss";
 
 :root {
-  /* Midnight Purple & Neon Violet Theme (Adrien Tickets Style) */
-  --bg-app: #080412;
-  --bg-surface: #120B24;
-  --bg-surface-elevated: #1B1136;
-  --border-subtle: #251846;
+  /* Thème GRTK — blanc universal, accent violet. */
+  --bg-app: #FFFFFF;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F7F7FB;
+  --bg-muted: #F6F7FB;
+  --border-subtle: #E7E7EF;
   --border-accent: #7C3AED;
-  --border-glow: rgba(168, 85, 247, 0.45);
+  --border-glow: rgba(124, 58, 237, 0.18);
 
-  --purple-primary: #8B5CF6;
-  --purple-bright: #A855F7;
-  --purple-glow: #C084FC;
-  --purple-deep: #5B21B6;
+  --purple-primary: #6D28D9;
+  --purple-bright: #7C3AED;
+  --purple-glow: #9333EA;
+  --purple-deep: #4C1D95;
 
-  --text-white: #FFFFFF;
-  --text-secondary: #A59EBF;
-  --text-muted: #6E6589;
+  --text-white: #111827;
+  --text-primary: #111827;
+  --text-secondary: #4B5563;
+  --text-muted: #6B7280;
 
-  --badge-pink: #EC4899;
-  --badge-cyan: #38BDF8;
-  --badge-green: #34D399;
+  --badge-pink: #DB2777;
+  --badge-cyan: #0284C7;
+  --badge-green: #059669;
 
   --font-heading: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -30,7 +32,7 @@
 
 body {
   background-color: var(--bg-app);
-  color: var(--text-white);
+  color: var(--text-primary);
   font-family: var(--font-body);
   min-height: 100vh;
   margin: 0;
@@ -40,117 +42,102 @@ body {
   overflow-x: hidden;
 }
 
-.font-heading {
-  font-family: var(--font-heading);
-}
+.font-heading { font-family: var(--font-heading); }
+.font-mono { font-family: var(--font-mono); }
+.font-tabular { font-variant-numeric: tabular-nums; }
 
-.font-mono {
-  font-family: var(--font-mono);
-}
-
-.font-tabular {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Neon Violet Glow Card */
+/* Carte blanche bordée — même rendu sur toutes les pages. */
 .neon-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: 20px;
-  transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: border-color 250ms ease, box-shadow 250ms ease, transform 250ms ease;
 }
 .neon-card:hover {
   border-color: var(--border-accent);
-  box-shadow: 0 10px 30px -5px rgba(139, 92, 246, 0.25), 0 0 15px 1px rgba(168, 85, 247, 0.2);
+  box-shadow: 0 12px 32px -12px rgba(76, 29, 149, 0.18);
   transform: translateY(-2px);
 }
 
-/* Glowing Neon Purple Gradient Button */
+/* Bouton principal violet — même rendu sur toutes les pages. */
 .btn-neon-purple {
-  background: linear-gradient(135deg, #A855F7 0%, #7C3AED 50%, #6366F1 100%);
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 55%, #5B21B6 100%);
   color: #FFFFFF;
   font-weight: 700;
   border-radius: 9999px;
-  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35);
-  transition: all 200ms ease;
+  box-shadow: 0 4px 14px rgba(109, 40, 217, 0.22);
+  transition: filter 200ms ease, box-shadow 200ms ease, transform 200ms ease;
 }
 .btn-neon-purple:hover {
-  filter: brightness(1.1);
-  box-shadow: 0 6px 28px rgba(168, 85, 247, 0.55);
+  filter: brightness(1.06);
+  box-shadow: 0 8px 22px rgba(109, 40, 217, 0.28);
   transform: translateY(-1px);
 }
-.btn-neon-purple:active {
-  transform: scale(0.98);
-}
+.btn-neon-purple:active { transform: scale(0.98); }
 
-/* Glass Outline Button */
+/* Bouton contour — même rendu sur toutes les pages. */
 .btn-glass-outline {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #FFFFFF;
+  background: #FFFFFF;
+  backdrop-filter: none;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
   border-radius: 9999px;
-  transition: all 200ms ease;
+  transition: border-color 200ms ease, background 200ms ease, transform 200ms ease;
 }
 .btn-glass-outline:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: var(--bg-muted);
+  border-color: var(--border-accent);
   transform: translateY(-1px);
 }
 
-/* Neon Text Gradient */
 .text-neon-gradient {
-  background: linear-gradient(135deg, #FFFFFF 20%, #E9D5FF 60%, #C084FC 100%);
+  background: linear-gradient(135deg, #111827 20%, #5B21B6 60%, #7C3AED 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-purple-gradient {
-  background: linear-gradient(135deg, #D8B4FE 0%, #A855F7 50%, #818CF8 100%);
+  background: linear-gradient(135deg, #6D28D9 0%, #7C3AED 50%, #9333EA 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Marquee Ribbon Banner */
 .ribbon-banner {
-  background: linear-gradient(90deg, #1C1138 0%, #2A1754 50%, #1C1138 100%);
+  background: linear-gradient(90deg, #FAF5FF 0%, #F3E8FF 50%, #FAF5FF 100%);
   border-top: 1px solid var(--border-subtle);
   border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Pulse Glow Animation */
 @keyframes glowPulse {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.05);
-  }
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.04); }
 }
+.ambient-glow { animation: glowPulse 6s ease-in-out infinite; }
 
-.ambient-glow {
-  animation: glowPulse 6s ease-in-out infinite;
-}
-
-/* ---------- Billets 3D réalistes ---------- */
+/* ---------- Billets 3D réalistes : orientation unique sur toutes les pages ---------- */
 .grtk-stage {
   position: relative;
   perspective: 1600px;
   perspective-origin: 50% 35%;
 }
 
-.grtk-3d {
+/* Une seule direction pour tous les billets, partout. */
+.grtk-3d,
+.grtk-3d--left,
+.grtk-3d--flat,
+.grtk-3d--right {
   position: relative;
   transform-style: preserve-3d;
   will-change: transform;
+  transform: rotateX(6deg) rotateY(-9deg) rotateZ(-1deg);
   transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 700ms ease;
   border-radius: 24px;
   box-shadow:
-    0 2px 2px rgba(10, 6, 30, 0.18),
-    0 18px 32px -12px rgba(15, 10, 40, 0.55),
-    0 44px 70px -28px rgba(80, 50, 180, 0.45);
+    0 2px 3px rgba(17, 24, 39, 0.06),
+    0 18px 32px -14px rgba(17, 24, 39, 0.22),
+    0 42px 70px -30px rgba(109, 40, 217, 0.28);
 }
 
 .grtk-3d::before,
@@ -165,17 +152,17 @@ body {
 /* Tranche carton : donne l'épaisseur réelle du billet. */
 .grtk-3d::before {
   transform: translateZ(-18px);
-  background: linear-gradient(160deg, var(--grtk-edge), #241559 70%);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+  background: linear-gradient(160deg, var(--grtk-edge), #5B21B6 70%);
+  box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.08);
 }
 
 /* Reflet sur les bords supérieurs. */
 .grtk-3d::after {
   transform: translateZ(2px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.32),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.38),
-    inset 1px 0 0 rgba(255, 255, 255, 0.12);
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(17, 24, 39, 0.12),
+    inset 1px 0 0 rgba(255, 255, 255, 0.6);
 }
 
 .grtk-3d-edge {
@@ -183,20 +170,16 @@ body {
   inset: 0;
   border-radius: inherit;
   transform: translateZ(-9px);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(0, 0, 0, 0.22));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(17, 24, 39, 0.1));
   pointer-events: none;
 }
 
-.grtk-3d--left { transform: rotateX(7deg) rotateY(-13deg) rotateZ(-2deg); }
-.grtk-3d--flat { transform: rotateX(5deg) rotateY(-7deg) rotateZ(-1deg); }
-.grtk-3d--right { transform: rotateX(7deg) rotateY(13deg) rotateZ(2deg); }
-
 .grtk-3d:hover {
-  transform: rotateX(1deg) rotateY(0deg) rotateZ(0deg) translateY(-10px) scale(1.01);
+  transform: rotateX(2deg) rotateY(-3deg) rotateZ(0deg) translateY(-10px) scale(1.01);
   box-shadow:
-    0 4px 4px rgba(10, 6, 30, 0.14),
-    0 28px 46px -14px rgba(15, 10, 40, 0.6),
-    0 60px 90px -30px rgba(110, 70, 220, 0.5);
+    0 4px 6px rgba(17, 24, 39, 0.07),
+    0 26px 46px -16px rgba(17, 24, 39, 0.24),
+    0 60px 90px -32px rgba(109, 40, 217, 0.32);
 }
 
 /* Perforation verticale entre le talon et le corps du billet. */
@@ -209,10 +192,10 @@ body {
   transform: translateZ(3px);
   background: repeating-linear-gradient(
     to bottom,
-    rgba(255, 255, 255, 0.55) 0 5px,
+    rgba(91, 33, 182, 0.45) 0 5px,
     transparent 5px 11px
   );
-  opacity: 0.5;
+  opacity: 0.55;
   pointer-events: none;
 }
 
@@ -225,11 +208,11 @@ body {
   background: linear-gradient(
     115deg,
     transparent 32%,
-    rgba(129, 140, 248, 0.16) 46%,
-    rgba(216, 180, 254, 0.22) 50%,
+    rgba(109, 40, 217, 0.10) 46%,
+    rgba(168, 85, 247, 0.14) 50%,
     transparent 64%
   );
-  mix-blend-mode: screen;
+  mix-blend-mode: multiply;
   pointer-events: none;
 }
 
@@ -240,7 +223,7 @@ body {
   height: 220%;
   width: 40%;
   transform: translateZ(5px) rotate(18deg);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
   pointer-events: none;
 }
 
@@ -251,14 +234,14 @@ body {
   bottom: -26px;
   height: 38px;
   border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(40, 20, 90, 0.5), transparent 70%);
+  background: radial-gradient(ellipse, rgba(109, 40, 217, 0.24), transparent 70%);
   filter: blur(11px);
   transform: translateZ(-40px);
   pointer-events: none;
 }
 
 @media (max-width: 767px) {
-  .grtk-perforation { right: 0; top: auto; bottom: 0; left: 0; width: 100%; height: 2px; background: repeating-linear-gradient(to right, rgba(255,255,255,.55) 0 5px, transparent 5px 11px); }
+  .grtk-perforation { right: 0; top: auto; bottom: 0; left: 0; width: 100%; height: 2px; background: repeating-linear-gradient(to right, rgba(91,33,182,.45) 0 5px, transparent 5px 11px); }
 }
 
 @media print {

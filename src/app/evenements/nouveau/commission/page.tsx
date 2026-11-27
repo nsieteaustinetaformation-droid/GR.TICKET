@@ -13,7 +13,7 @@ import { getCountryConfig } from "@/lib/international/config";
 import "@/lib/international/seed";
 
 const field =
-  "w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none focus:border-purple-400";
+  "w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100";
 
 function CommissionWizard() {
   const router = useRouter();
@@ -22,7 +22,7 @@ function CommissionWizard() {
 
   useEffect(() => { setDraft(loadDraft()); }, []);
 
-  if (!draft) return <main className="min-h-screen bg-[#080412]" />;
+  if (!draft) return <main className="min-h-screen bg-white" />;
 
   const config = getCountryConfig(draft.countryCode);
   const currency = draft.currency || config.currency;
@@ -47,42 +47,42 @@ function CommissionWizard() {
   };
 
   return (
-    <main className="min-h-screen bg-[#080412] text-white px-4 py-10">
+    <main className="min-h-screen bg-white px-4 py-10 text-slate-900">
       <div className="max-w-3xl mx-auto">
-        <Link href="/evenements/nouveau/billets" className="inline-flex items-center gap-2 text-xs text-white/50 hover:text-white">
+        <Link href="/evenements/nouveau/billets" className="inline-flex items-center gap-2 text-xs text-slate-500 hover:text-slate-900">
           <ArrowLeft className="w-4 h-4" /> Étape précédente
         </Link>
         <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight mt-6">Commission & paiement</h1>
-        <p className="text-sm text-white/50 mt-1">Étape 3 sur 4 — la plateforme prélève {DEFAULT_COMMISSION_PERCENT} % sur chaque vente.</p>
+        <p className="text-sm text-slate-500 mt-1">Étape 3 sur 4 — la plateforme prélève {DEFAULT_COMMISSION_PERCENT} % sur chaque vente.</p>
         <div className="mt-8"><WizardSteps current={3} /></div>
 
         <form onSubmit={next} className="space-y-5">
-          <div className="rounded-3xl border border-purple-400/20 bg-[#0E0A1C] p-6 sm:p-8 space-y-4">
-            <div className="flex items-center gap-2 text-purple-300">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4 sm:p-8">
+            <div className="flex items-center gap-2 text-violet-700">
               <ShieldCheck className="w-5 h-5" />
               <h2 className="text-xs font-bold uppercase tracking-wider">Répartition des revenus</h2>
             </div>
             <div className="grid sm:grid-cols-3 gap-4">
-              <div className="rounded-2xl bg-white/5 p-4">
-                <p className="text-[11px] uppercase text-white/40">Ventes potentielles</p>
-                <p className="text-lg font-black mt-1">{money(gross)}</p>
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <p className="text-[11px] uppercase text-slate-500">Ventes potentielles</p>
+                <p className="text-lg font-black mt-1 text-slate-900">{money(gross)}</p>
               </div>
-              <div className="rounded-2xl bg-red-500/10 border border-red-400/20 p-4">
-                <p className="text-[11px] uppercase text-red-200/70">Commission GRTK ({DEFAULT_COMMISSION_PERCENT} %)</p>
-                <p className="text-lg font-black mt-1 text-red-300">− {money(commission)}</p>
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-4">
+                <p className="text-[11px] uppercase text-red-600">Commission GRTK ({DEFAULT_COMMISSION_PERCENT} %)</p>
+                <p className="text-lg font-black mt-1 text-red-600">− {money(commission)}</p>
               </div>
-              <div className="rounded-2xl bg-emerald-500/10 border border-emerald-400/20 p-4">
-                <p className="text-[11px] uppercase text-emerald-200/70">Vous recevez ({100 - DEFAULT_COMMISSION_PERCENT} %)</p>
-                <p className="text-lg font-black mt-1 text-emerald-300">{money(net)}</p>
+              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                <p className="text-[11px] uppercase text-emerald-700">Vous recevez ({100 - DEFAULT_COMMISSION_PERCENT} %)</p>
+                <p className="text-lg font-black mt-1 text-emerald-700">{money(net)}</p>
               </div>
             </div>
-            <p className="text-[11px] text-white/40">
+            <p className="text-[11px] text-slate-500">
               La commission est calculée sur chaque billet vendu. Le montant net vous est reversé sur le numéro ci-dessous.
             </p>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-[#0E0A1C] p-6 sm:p-8 space-y-4">
-            <h2 className="text-xs font-bold uppercase tracking-wider text-white/60">Où recevoir votre argent ?</h2>
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4 sm:p-8">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700">Où recevoir votre argent ?</h2>
             <div className="grid grid-cols-2 gap-3">
               {payoutMethods.map((method) => (
                 <button
@@ -91,8 +91,8 @@ function CommissionWizard() {
                   onClick={() => update({ payoutMethod: method })}
                   className={`rounded-xl border p-4 text-xs font-bold uppercase tracking-wider transition ${
                     draft.payoutMethod === method
-                      ? "border-amber-400 bg-amber-500/15 text-amber-200"
-                      : "border-white/10 bg-white/5 text-white/50"
+                      ? "border-violet-600 bg-violet-50 text-violet-700"
+                      : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
                   }`}
                 >
                   {method.toUpperCase()}
@@ -100,18 +100,18 @@ function CommissionWizard() {
               ))}
             </div>
             <label className="block space-y-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-white/50">Coordonnées de réception ({config.countryCode || "international"})</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Coordonnées de réception ({config.countryCode || "international"})</span>
               <input className={field} value={draft.payoutPhone} onChange={(e) => update({ payoutPhone: e.target.value })} placeholder="Numéro ou identifiant selon le moyen de paiement" required />
             </label>
-            <label className="flex items-start gap-3 text-xs text-white/60 cursor-pointer">
-              <input type="checkbox" checked={draft.accepted} onChange={(e) => update({ accepted: e.target.checked })} className="mt-1 w-4 h-4 accent-purple-500" />
+            <label className="flex items-start gap-3 text-xs text-slate-600 cursor-pointer">
+              <input type="checkbox" checked={draft.accepted} onChange={(e) => update({ accepted: e.target.checked })} className="mt-1 w-4 h-4 accent-violet-600" />
               <span>J&apos;accepte que la plateforme prélève {DEFAULT_COMMISSION_PERCENT} % sur chaque billet vendu et me reverse {100 - DEFAULT_COMMISSION_PERCENT} % des ventes.</span>
             </label>
           </div>
 
-          {error && <p className="text-xs text-red-300">{error}</p>}
+          {error && <p className="text-xs text-red-600">{error}</p>}
 
-          <button type="submit" className="w-full rounded-xl bg-purple-600 py-3.5 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-purple-500">
+          <button type="submit" className="w-full rounded-xl bg-violet-600 py-3.5 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 text-white hover:bg-violet-700">
             Continuer vers l&apos;aperçu <ArrowRight className="w-4 h-4" />
           </button>
         </form>

@@ -1,41 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Sun, Moon } from "lucide-react";
-import { Button } from "./Button";
+import React from "react";
+import { Sun } from "lucide-react";
 
+/** L'application GRTK utilise un thème blanc unique sur toutes les pages. */
 export function ThemeToggle() {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-
-  useEffect(() => {
-    // Vérifie le thème initial sur la balise html
-    const currentTheme = document.documentElement.getAttribute("data-theme") as "dark" | "light" | null;
-    if (currentTheme) {
-      setTheme(currentTheme);
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    setTheme(nextTheme);
-    document.documentElement.setAttribute("data-theme", nextTheme);
-    if (nextTheme === "light") {
-      document.documentElement.classList.add("light");
-    } else {
-      document.documentElement.classList.remove("light");
-    }
-  };
-
   return (
-    <Button
-      variant="secondary"
-      size="sm"
-      onClick={toggleTheme}
-      aria-label={`Passer en mode ${theme === "dark" ? "clair" : "sombre"}`}
-      leftIcon={theme === "dark" ? <Sun className="w-4 h-4 text-[var(--gold-primary)]" /> : <Moon className="w-4 h-4 text-[var(--gold-primary)]" />}
-      className="text-xs"
-    >
-      <span>Mode {theme === "dark" ? "Clair" : "Sombre"}</span>
-    </Button>
+    <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600">
+      <Sun className="h-4 w-4 text-violet-600" />
+      Mode clair
+    </span>
   );
 }

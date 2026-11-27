@@ -30,7 +30,7 @@ function TicketView() {
       });
   }, [id]);
 
-  if (!ticket) return <main className="min-h-screen bg-[#080412] p-8 text-white">Chargement du billet…</main>;
+  if (!ticket) return <main className="min-h-screen bg-white p-8 text-slate-900">Chargement du billet…</main>;
 
   const locale = normalizeLocale(event?.locale ?? getCountryConfig(event?.countryCode ?? "").locale);
   const localDate = formatInZone(
@@ -58,9 +58,9 @@ function TicketView() {
   }
 
   return (
-    <main className="min-h-screen bg-[#080412] px-4 py-10 text-white">
+    <main className="min-h-screen bg-white px-4 py-10 text-slate-900">
       <div className="mx-auto max-w-3xl space-y-6">
-        <Link href="/dashboard" className="text-xs text-white/50 hover:text-white">← Tableau de bord</Link>
+        <Link href="/dashboard" className="text-xs text-slate-500 hover:text-violet-700">← Tableau de bord</Link>
         <RealisticTicket3D edgeColor={event?.branding?.primaryColor}>
           <ProfessionalTicket
             ticket={ticket}
@@ -72,15 +72,15 @@ function TicketView() {
           />
         </RealisticTicket3D>
 
-        <div className="rounded-2xl border border-white/10 bg-[#0E0A1C] p-5 text-sm">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-white/60">Transférer le billet</h2>
-          <p className="mt-1 text-xs text-white/40">Transfert uniquement via GRTK, au prix d&apos;origine. L&apos;ancien QR est invalidé.</p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm shadow-sm">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-600">Transférer le billet</h2>
+          <p className="mt-1 text-xs text-slate-500">Transfert uniquement via GRTK, au prix d&apos;origine. L&apos;ancien QR est invalidé.</p>
           <div className="mt-3 flex gap-2">
-            <input value={transferTo} onChange={(e) => setTransferTo(e.target.value)} placeholder="Nom du nouveau titulaire" className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm outline-none focus:border-purple-400" />
-            <button onClick={() => void transfer()} className="rounded-xl bg-purple-600 px-4 text-[11px] font-bold uppercase">Transférer</button>
+            <input value={transferTo} onChange={(e) => setTransferTo(e.target.value)} placeholder="Nom du nouveau titulaire" className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100" />
+            <button onClick={() => void transfer()} className="rounded-xl bg-violet-600 px-4 py-3 text-[11px] font-bold uppercase text-white hover:bg-violet-700">Transférer</button>
           </div>
-          {message && <p className="mt-3 text-xs text-emerald-300">{message}</p>}
-          <Link href={`/reclamation?ticket=${ticket.id}`} className="mt-4 inline-block text-[11px] font-bold uppercase text-amber-300">Le scan a échoué ? Déposer une réclamation →</Link>
+          {message && <p className="mt-3 text-xs text-emerald-700">{message}</p>}
+          <Link href={`/reclamation?ticket=${ticket.id}`} className="mt-4 inline-block text-[11px] font-bold uppercase text-amber-700">Le scan a échoué ? Déposer une réclamation →</Link>
         </div>
       </div>
     </main>
@@ -88,5 +88,5 @@ function TicketView() {
 }
 
 export default function TicketPage() {
-  return <Suspense fallback={<main className="min-h-screen bg-[#080412]" />}><TicketView /></Suspense>;
+  return <Suspense fallback={<main className="min-h-screen bg-white" />}><TicketView /></Suspense>;
 }

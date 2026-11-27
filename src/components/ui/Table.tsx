@@ -7,7 +7,7 @@ export function Table({
   ...props
 }: React.TableHTMLAttributes<HTMLTableElement>) {
   return (
-    <div className="w-full overflow-x-auto rounded-xl border border-[var(--border-app)] bg-[var(--bg-surface)]">
+    <div className="w-full overflow-x-auto rounded-xl border border-slate-200 bg-white">
       <table
         className={cn("w-full caption-bottom text-sm text-left border-collapse", className)}
         {...props}
@@ -26,7 +26,7 @@ export function TableHeader({
   return (
     <thead
       className={cn(
-        "border-b border-[var(--border-app)] bg-[var(--bg-surface-elevated)]/60 text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold",
+        "border-b border-slate-200 bg-slate-50 text-xs uppercase tracking-wider text-slate-500 font-semibold",
         className
       )}
       {...props}
@@ -43,7 +43,7 @@ export function TableBody({
 }: React.HTMLAttributes<HTMLTableSectionElement>) {
   return (
     <tbody
-      className={cn("divide-y divide-[var(--border-app)] text-[var(--text-primary)]", className)}
+      className={cn("divide-y divide-slate-100 text-slate-900", className)}
       {...props}
     >
       {children}
@@ -59,7 +59,7 @@ export function TableRow({
   return (
     <tr
       className={cn(
-        "transition-colors hover:bg-[var(--gold-subtle)]/40 focus:bg-[var(--gold-subtle)]/60",
+        "transition-colors hover:bg-violet-50 focus:bg-violet-50",
         className
       )}
       {...props}

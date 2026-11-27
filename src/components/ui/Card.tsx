@@ -14,18 +14,18 @@ export function Card({
   ...props
 }: CardProps) {
   const variantStyles = {
-    surface: "bg-[var(--bg-surface)] border-[var(--border-app)]",
-    elevated: "bg-[var(--bg-surface-elevated)] border-[var(--border-app)] shadow-lg",
+    surface: "bg-white border-slate-200",
+    elevated: "bg-white border-slate-200 shadow-lg shadow-slate-200/60",
     interactive:
-      "bg-[var(--bg-surface)] border-[var(--border-app)] hover:border-[var(--gold-primary)] hover:shadow-[var(--shadow-gold)] transition-all duration-200 cursor-pointer",
+      "bg-white border-slate-200 hover:border-violet-400 hover:shadow-lg hover:shadow-violet-100 transition-all duration-200 cursor-pointer",
   };
 
   return (
     <div
       className={cn(
-        "rounded-xl border p-5 sm:p-6 text-[var(--text-primary)] transition-colors",
+        "rounded-xl border p-5 sm:p-6 text-slate-900 transition-colors",
         variantStyles[variant],
-        isGoldBordered && "border-[var(--gold-primary)] shadow-[var(--shadow-gold)]",
+        isGoldBordered && "border-violet-500 shadow-lg shadow-violet-100",
         className
       )}
       {...props}
@@ -54,10 +54,7 @@ export function CardTitle({
 }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={cn(
-        "text-lg font-bold tracking-tight text-[var(--text-primary)]",
-        className
-      )}
+      className={cn("text-lg font-bold tracking-tight text-slate-900", className)}
       {...props}
     >
       {children}
@@ -72,7 +69,7 @@ export function CardDescription({
 }: React.HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn("text-xs text-[var(--text-secondary)] leading-relaxed", className)}
+      className={cn("text-xs text-slate-500 leading-relaxed", className)}
       {...props}
     >
       {children}
@@ -95,7 +92,7 @@ export function CardFooter({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("flex items-center pt-4 border-t border-[var(--border-app)] mt-4", className)}
+      className={cn("flex items-center pt-4 border-t border-slate-200 mt-4", className)}
       {...props}
     >
       {children}

@@ -105,28 +105,28 @@ export function Ticket({
   return (
     <div className="w-full max-w-3xl mx-auto my-4 transition-all">
       {/* Conteneur du Billet style Fiche d'Embarquement Concert */}
-      <div className="relative flex flex-col md:flex-row rounded-2xl overflow-hidden border border-[#2A2A2E] bg-[#0A0A0B] text-[#F5F1E8] shadow-2xl">
+      <div className="relative flex flex-col md:flex-row rounded-2xl overflow-hidden border border-slate-200 bg-white text-slate-900 shadow-lg shadow-slate-200/60">
         
         {/* CORPS PRINCIPAL DU BILLET (Fond Noir Profond) */}
         <div className="relative flex-1 p-6 md:p-8 flex flex-col justify-between">
           
           {/* Filigrane GRTK */}
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 select-none pointer-events-none opacity-[0.03] text-8xl font-black font-display uppercase tracking-widest text-[#D4A22A]">
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 select-none pointer-events-none opacity-[0.03] text-8xl font-black font-display uppercase tracking-widest text-violet-700">
             GRTK
           </div>
 
           {/* En-tête du Billet */}
           <div>
-            <div className="flex items-center justify-between gap-4 pb-4 border-b border-[#2A2A2E]">
+            <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#F0C75E] to-[#9C7416] flex items-center justify-center text-black font-bold">
+                <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center text-black font-bold">
                   <Music2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-[#D4A22A] block leading-none">
+                  <span className="text-xs font-bold uppercase tracking-wider text-violet-700 block leading-none">
                     GRTK
                   </span>
-                  <span className="text-[10px] text-[#A8A39A] uppercase tracking-widest">
+                  <span className="text-[10px] text-slate-500 uppercase tracking-widest">
                     Billetterie internationale
                   </span>
                 </div>
@@ -137,17 +137,17 @@ export function Ticket({
             </div>
 
             {/* Nom de l'Événement en très grand style Affiche de Concert */}
-            <h2 className="mt-5 text-3xl sm:text-4xl lg:text-5xl font-display font-black uppercase tracking-tight text-[#F5F1E8] leading-none">
+            <h2 className="mt-5 text-3xl sm:text-4xl lg:text-5xl font-display font-black uppercase tracking-tight text-slate-900 leading-none">
               {eventName}
             </h2>
 
             {/* Catégorie du Billet */}
             <div className="mt-3 flex items-center gap-2">
-              <span className="px-3 py-1 rounded-md bg-[#D4A22A]/15 border border-[#D4A22A] text-[#F0C75E] text-xs font-bold uppercase tracking-wider">
+              <span className="px-3 py-1 rounded-md bg-violet-50 border border-violet-300 text-violet-700 text-xs font-bold uppercase tracking-wider">
                 Catégorie : {category}
               </span>
               {gate && (
-                <span className="px-3 py-1 rounded-md bg-[#1A1A1D] border border-[#2A2A2E] text-xs font-mono text-[#A8A39A]">
+                <span className="px-3 py-1 rounded-md bg-slate-50 border border-slate-200 text-xs font-mono text-slate-500">
                   Porte : {gate}
                 </span>
               )}
@@ -155,31 +155,31 @@ export function Ticket({
           </div>
 
           {/* Détails Date, Lieu & Acheteur */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6 py-4 border-y border-[#2A2A2E]/80 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6 py-4 border-y border-slate-200 text-xs">
             <div className="space-y-1">
-              <span className="text-[#A8A39A] uppercase tracking-wider flex items-center gap-1.5 font-medium">
-                <Calendar className="w-3.5 h-3.5 text-[#D4A22A]" /> Date & Heure
+              <span className="text-slate-500 uppercase tracking-wider flex items-center gap-1.5 font-medium">
+                <Calendar className="w-3.5 h-3.5 text-violet-700" /> Date & Heure
               </span>
-              <p className="font-semibold text-sm text-[#F5F1E8]">
+              <p className="font-semibold text-sm text-slate-900">
                 {formatInZone(new Date(eventDate).toISOString(), resolvedZone, resolvedLocale === "fr" ? "fr-FR" : "en-US")}
               </p>
             </div>
 
             <div className="space-y-1">
-              <span className="text-[#A8A39A] uppercase tracking-wider flex items-center gap-1.5 font-medium">
-                <MapPin className="w-3.5 h-3.5 text-[#D4A22A]" /> Lieu
+              <span className="text-slate-500 uppercase tracking-wider flex items-center gap-1.5 font-medium">
+                <MapPin className="w-3.5 h-3.5 text-violet-700" /> Lieu
               </span>
-              <p className="font-semibold text-sm text-[#F5F1E8]">
+              <p className="font-semibold text-sm text-slate-900">
                 {location}{city ? `, ${city}` : ""}
               </p>
             </div>
 
             <div className="space-y-1 sm:col-span-2">
-              <span className="text-[#A8A39A] uppercase tracking-wider flex items-center gap-1.5 font-medium">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#D4A22A]" /> Titulaire du billet
+              <span className="text-slate-500 uppercase tracking-wider flex items-center gap-1.5 font-medium">
+                <ShieldCheck className="w-3.5 h-3.5 text-violet-700" /> Titulaire du billet
               </span>
-              <p className="font-semibold text-sm text-[#F5F1E8]">
-                {buyerName} {buyerPhone && <span className="text-[#A8A39A] font-mono">({buyerPhone})</span>}
+              <p className="font-semibold text-sm text-slate-900">
+                {buyerName} {buyerPhone && <span className="text-slate-500 font-mono">({buyerPhone})</span>}
               </p>
             </div>
           </div>
@@ -187,29 +187,29 @@ export function Ticket({
           {/* Pied du Billet : Code Unique & Montant */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <span className="text-[10px] text-[#A8A39A] uppercase tracking-wider block">
+              <span className="text-[10px] text-slate-500 uppercase tracking-wider block">
                 Code Unique Sécurisé
               </span>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="font-mono text-base font-bold tracking-wider text-[#D4A22A] bg-[#121214] px-2.5 py-1 rounded border border-[#2A2A2E]">
+                <span className="font-mono text-base font-bold tracking-wider text-violet-700 bg-slate-50 px-2.5 py-1 rounded border border-slate-200">
                   {ticketCode}
                 </span>
                 <button
                   type="button"
                   onClick={copyCode}
                   aria-label="Copier le code"
-                  className="p-1.5 rounded hover:bg-[#1A1A1D] text-[#A8A39A] hover:text-[#F5F1E8] transition-colors"
+                  className="p-1.5 rounded hover:bg-slate-50 text-slate-500 hover:text-slate-900 transition-colors"
                 >
-                  {copied ? <Check className="w-4 h-4 text-[#3DD68C]" /> : <Copy className="w-4 h-4" />}
+                  {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
             <div className="text-right">
-              <span className="text-[10px] text-[#A8A39A] uppercase tracking-wider block">
+              <span className="text-[10px] text-slate-500 uppercase tracking-wider block">
                 Tarif Unitaire
               </span>
-              <span className="font-mono font-black text-2xl text-[#F5F1E8] font-tabular">
+              <span className="font-mono font-black text-2xl text-slate-900 font-tabular">
                 {price === 0 ? "GRATUIT" : formatMoney(price, resolvedCurrency, resolvedLocale)}
               </span>
             </div>
@@ -217,28 +217,28 @@ export function Ticket({
         </div>
 
         {/* LIGNE DE PERFORATION STYLISÉE (DÉCOUPE BILLET) */}
-        <div className="relative md:w-6 flex md:flex-col items-center justify-between py-2 md:py-0 md:px-0 bg-[#0A0A0B]">
+        <div className="relative md:w-6 flex md:flex-col items-center justify-between py-2 md:py-0 md:px-0 bg-white">
           {/* Encoche Perforation Haut */}
-          <div className="hidden md:block w-6 h-6 -mt-3 rounded-full bg-[#121214] border border-[#2A2A2E]" />
+          <div className="hidden md:block w-6 h-6 -mt-3 rounded-full bg-slate-50 border border-slate-200" />
           {/* Ligne pointillée */}
-          <div className="hidden md:block w-full border-r-2 border-dashed border-[#2A2A2E] h-full" />
+          <div className="hidden md:block w-full border-r-2 border-dashed border-slate-200 h-full" />
           {/* Encoche Perforation Bas */}
-          <div className="hidden md:block w-6 h-6 -mb-3 rounded-full bg-[#121214] border border-[#2A2A2E]" />
+          <div className="hidden md:block w-6 h-6 -mb-3 rounded-full bg-slate-50 border border-slate-200" />
         </div>
 
         {/* TALON OR AVEC QR CODE (STUB DETACHABLE) */}
-        <div className="w-full md:w-64 bg-gradient-to-b from-[#16140D] to-[#121008] border-t md:border-t-0 md:border-l border-[#2A2A2E] p-6 flex flex-col items-center justify-between text-center">
+        <div className="w-full md:w-64 bg-violet-50 border-t md:border-t-0 md:border-l border-slate-200 p-6 flex flex-col items-center justify-between text-center">
           
           <div className="w-full">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[#D4A22A] block mb-1">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-violet-700 block mb-1">
               CONTRÔLE D'ACCÈS
             </span>
-            <p className="text-xs text-[#A8A39A] mb-3">
+            <p className="text-xs text-slate-500 mb-3">
               À présenter au scan à l'entrée
             </p>
 
             {/* Conteneur Blanc du QR Code pour scan instantané en haute vitesse */}
-            <div className="p-3 bg-white rounded-xl shadow-lg mx-auto inline-block border-2 border-[#D4A22A]">
+            <div className="p-3 bg-white rounded-xl shadow-lg mx-auto inline-block border-2 border-violet-300">
               {qrDataUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -253,13 +253,13 @@ export function Ticket({
               )}
             </div>
 
-            <p className="mt-2 text-[10px] font-mono text-[#D4A22A] tracking-wider font-semibold">
+            <p className="mt-2 text-[10px] font-mono text-violet-700 tracking-wider font-semibold">
               JETON HMAC SÉCURISÉ
             </p>
           </div>
 
           {/* Boutons d'action rapides */}
-          <div className="w-full space-y-2 mt-4 pt-3 border-t border-[#2A2A2E]/60">
+          <div className="w-full space-y-2 mt-4 pt-3 border-t border-slate-200">
             {onShareWhatsApp && (
               <Button
                 variant="outline"
@@ -272,7 +272,7 @@ export function Ticket({
               </Button>
             )}
 
-            <p className="text-[9px] text-[#A8A39A] uppercase tracking-wider">
+            <p className="text-[9px] text-slate-500 uppercase tracking-wider">
               Billet 100% Nominatif • Non Répudiable
             </p>
           </div>

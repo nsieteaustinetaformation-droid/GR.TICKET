@@ -61,11 +61,11 @@ export function ProfessionalTicket({ ticket, branding, localDate, venue, city, l
     canvas.height = 480;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    ctx.fillStyle = branding?.backgroundColor ?? "#0A0A0B";
+    ctx.fillStyle = branding?.backgroundColor ?? "#FFFFFF";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = branding?.primaryColor ?? "#8B5CF6";
+    ctx.fillStyle = branding?.primaryColor ?? "#7C3AED";
     ctx.fillRect(0, 0, 12, canvas.height);
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = "#111827";
     ctx.font = "bold 32px sans-serif";
     ctx.fillText(ticket.eventTitle.slice(0, 32), 40, 60);
     ctx.font = "18px sans-serif";
@@ -74,7 +74,7 @@ export function ProfessionalTicket({ ticket, branding, localDate, venue, city, l
     ctx.fillText(`${translate(l, "ticket.price")}: ${formatMoney(ticket.priceMinor, ticket.currency, l)}`, 40, 170);
     ctx.fillText(`${translate(l, "ticket.number")}: ${ticket.id.slice(0, 12).toUpperCase()}`, 40, 200);
     if (qrRef.current) ctx.drawImage(qrRef.current, 600, 70, 260, 260);
-    ctx.fillStyle = "#34D399";
+    ctx.fillStyle = "#059669";
     ctx.font = "bold 16px sans-serif";
     ctx.fillText(translate(l, "guarantee.badge"), 40, 430);
     const link = document.createElement("a");
@@ -85,12 +85,12 @@ export function ProfessionalTicket({ ticket, branding, localDate, venue, city, l
 
   return (
     <article
-      className="grtk-ticket relative mx-auto w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-[#0A0A0B] text-white shadow-2xl print:border-none"
+      className="grtk-ticket relative mx-auto w-full max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-white text-slate-900 shadow-lg shadow-slate-200/60 print:border-none"
       style={
         {
-          "--grtk-primary": branding?.primaryColor ?? "#8B5CF6",
-          "--grtk-secondary": branding?.secondaryColor ?? "#D4A22A",
-          "--grtk-bg": branding?.backgroundColor ?? "#0A0A0B",
+          "--grtk-primary": branding?.primaryColor ?? "#7C3AED",
+          "--grtk-secondary": branding?.secondaryColor ?? "#B45309",
+          "--grtk-bg": branding?.backgroundColor ?? "#FFFFFF",
         } as React.CSSProperties
       }
     >
@@ -101,7 +101,7 @@ export function ProfessionalTicket({ ticket, branding, localDate, venue, city, l
 
       <div className="relative flex flex-col md:flex-row">
         <div className="relative flex-1 p-6 sm:p-8">
-          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+          <div className="flex items-center justify-between border-b border-slate-200 pb-4">
             <div className="flex items-center gap-2">
               {branding?.logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -119,67 +119,67 @@ export function ProfessionalTicket({ ticket, branding, localDate, venue, city, l
             {ticket.seatLabel}
           </span>
 
-          <div className="my-6 grid gap-4 border-y border-white/10 py-5 text-xs sm:grid-cols-2">
+          <div className="my-6 grid gap-4 border-y border-slate-200 py-5 text-xs sm:grid-cols-2">
             <div>
-              <p className="flex items-center gap-1.5 uppercase tracking-wider text-white/40"><Calendar className="h-3.5 w-3.5" /> {l === "fr" ? "Date et heure" : "Date and time"}</p>
+              <p className="flex items-center gap-1.5 uppercase tracking-wider text-slate-500"><Calendar className="h-3.5 w-3.5" /> {l === "fr" ? "Date et heure" : "Date and time"}</p>
               <p className="mt-1 font-semibold">{localDate}</p>
             </div>
             <div>
-              <p className="flex items-center gap-1.5 uppercase tracking-wider text-white/40"><MapPin className="h-3.5 w-3.5" /> {l === "fr" ? "Lieu" : "Venue"}</p>
+              <p className="flex items-center gap-1.5 uppercase tracking-wider text-slate-500"><MapPin className="h-3.5 w-3.5" /> {l === "fr" ? "Lieu" : "Venue"}</p>
               <p className="mt-1 font-semibold">{[venue, city].filter(Boolean).join(", ")}</p>
             </div>
             <div className="sm:col-span-2">
-              <p className="flex items-center gap-1.5 uppercase tracking-wider text-white/40"><ShieldCheck className="h-3.5 w-3.5" /> {translate(l, "ticket.holder")}</p>
+              <p className="flex items-center gap-1.5 uppercase tracking-wider text-slate-500"><ShieldCheck className="h-3.5 w-3.5" /> {translate(l, "ticket.holder")}</p>
               <p className="mt-1 font-semibold">{ticket.holderName}</p>
             </div>
           </div>
 
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-white/40">{translate(l, "ticket.number")}</p>
+              <p className="text-[10px] uppercase tracking-wider text-slate-500">{translate(l, "ticket.number")}</p>
               <p className="font-mono text-sm font-bold tracking-wider text-[var(--grtk-secondary)]">{ticket.id.slice(0, 12).toUpperCase()}</p>
             </div>
             <div className="text-right">
-              <p className="text-[10px] uppercase tracking-wider text-white/40">{translate(l, "ticket.price")}</p>
+              <p className="text-[10px] uppercase tracking-wider text-slate-500">{translate(l, "ticket.price")}</p>
               <p className="font-mono text-2xl font-black">{formatMoney(ticket.priceMinor, ticket.currency, l)}</p>
             </div>
           </div>
         </div>
 
-        <div className="flex w-full flex-col items-center justify-between gap-4 border-t border-white/10 bg-gradient-to-b from-white/5 to-transparent p-6 md:w-64 md:border-l md:border-t-0">
+        <div className="flex w-full flex-col items-center justify-between gap-4 border-t border-slate-200 bg-slate-50 p-6 md:w-64 md:border-l md:border-t-0">
           <div className="text-center">
             <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--grtk-primary)]">{translate(l, "ticket.qr")}</p>
-            <p className="mt-1 text-[10px] text-white/40">{remaining}s</p>
+            <p className="mt-1 text-[10px] text-slate-500">{remaining}s</p>
           </div>
-          <div className="rounded-2xl bg-white p-3 shadow-lg">
+          <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-md">
             {qr ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img ref={qrRef} src={qr} alt="QR dynamique GRTK" className="h-40 w-40" />
             ) : (
-              <div className="h-40 w-40 animate-pulse bg-white/70" />
+              <div className="h-40 w-40 animate-pulse bg-slate-200" />
             )}
           </div>
-          {error && <p className="text-center text-[10px] text-red-300">{error}</p>}
-          <p className="text-center text-[9px] uppercase leading-relaxed tracking-wider text-white/40">
+          {error && <p className="text-center text-[10px] text-rose-600">{error}</p>}
+          <p className="text-center text-[9px] uppercase leading-relaxed tracking-wider text-slate-500">
             {l === "fr" ? "Présentez ce QR dans l'application GRTK. Une capture d'écran ne passe pas." : "Show this QR in the GRTK app. A screenshot will not work."}
           </p>
         </div>
       </div>
 
-      <div className="relative flex flex-wrap gap-2 border-t border-white/10 bg-black/30 p-4 print:hidden">
-        <button onClick={() => void refresh()} className="rounded-lg bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider hover:bg-white/20">
+      <div className="relative flex flex-wrap gap-2 border-t border-slate-200 bg-slate-50 p-4 print:hidden">
+        <button onClick={() => void refresh()} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-700 hover:border-violet-300 hover:bg-violet-50">
           {l === "fr" ? "Actualiser le QR" : "Refresh QR"}
         </button>
-        <button onClick={downloadPng} className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider hover:bg-white/20">
+        <button onClick={downloadPng} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-700 hover:border-violet-300 hover:bg-violet-50">
           <Download className="h-3.5 w-3.5" /> PNG
         </button>
-        <button onClick={() => window.print()} className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider hover:bg-white/20">
+        <button onClick={() => window.print()} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-700 hover:border-violet-300 hover:bg-violet-50">
           <Printer className="h-3.5 w-3.5" /> PDF
         </button>
-        <a href={`/api/v1/tickets/${ticket.id}/pass?kind=apple`} className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider hover:bg-white/20">
+        <a href={`/api/v1/tickets/${ticket.id}/pass?kind=apple`} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-700 hover:border-violet-300 hover:bg-violet-50">
           <Wallet className="h-3.5 w-3.5" /> Apple Wallet
         </a>
-        <a href={`/api/v1/tickets/${ticket.id}/pass?kind=google`} className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider hover:bg-white/20">
+        <a href={`/api/v1/tickets/${ticket.id}/pass?kind=google`} className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-700 hover:border-violet-300 hover:bg-violet-50">
           <Wallet className="h-3.5 w-3.5" /> Google Wallet
         </a>
       </div>

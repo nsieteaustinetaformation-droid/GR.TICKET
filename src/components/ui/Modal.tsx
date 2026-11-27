@@ -62,9 +62,9 @@ export function Modal({
       aria-modal="true"
       aria-labelledby="modal-title"
     >
-      {/* Arrière-plan flou sombre */}
+      {/* Arrière-plan flou clair */}
       <div
-        className="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-slate-900/30 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
@@ -72,22 +72,22 @@ export function Modal({
       <div
         ref={modalRef}
         className={cn(
-          "relative w-full rounded-2xl bg-[var(--bg-surface-elevated)] border border-[var(--border-app)] text-[var(--text-primary)] shadow-2xl z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-150",
+          "relative w-full rounded-2xl bg-white border border-slate-200 text-slate-900 shadow-2xl shadow-slate-300/50 z-10 overflow-hidden animate-in fade-in zoom-in-95 duration-150",
           maxWidthStyles[maxWidth]
         )}
       >
-        {/* Accent doré supérieur */}
-        <div className="h-1 w-full bg-gradient-to-r from-[var(--gold-dark)] via-[var(--gold-primary)] to-[var(--gold-hover)]" />
+        {/* Accent violet supérieur */}
+        <div className="h-1 w-full bg-gradient-to-r from-violet-700 via-violet-600 to-violet-400" />
 
         <div className="p-6">
           {/* En-tête */}
-          <div className="flex items-start justify-between gap-4 pb-4 border-b border-[var(--border-app)]">
+          <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-200">
             <div>
-              <h3 id="modal-title" className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
+              <h3 id="modal-title" className="text-xl font-bold tracking-tight text-slate-900">
                 {title}
               </h3>
               {description && (
-                <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                <p className="mt-1 text-xs text-slate-500">
                   {description}
                 </p>
               )}
@@ -97,7 +97,7 @@ export function Modal({
               onClick={onClose}
               type="button"
               aria-label="Fermer la boîte de dialogue"
-              className="rounded-lg p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)] min-touch-target flex items-center justify-center transition-colors"
+              className="rounded-lg p-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 min-touch-target flex items-center justify-center transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -108,7 +108,7 @@ export function Modal({
 
           {/* Pied de page optionnel */}
           {footer && (
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border-app)]">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
               {footer}
             </div>
           )}

@@ -24,24 +24,24 @@ export function Alert({
   ...props
 }: AlertProps) {
   const defaultIcons: Record<AlertVariant, React.ReactNode> = {
-    success: <CheckCircle2 className="w-5 h-5 text-[var(--state-success)] shrink-0 mt-0.5" />,
-    alert: <AlertTriangle className="w-5 h-5 text-[var(--state-alert)] shrink-0 mt-0.5" />,
-    error: <AlertCircle className="w-5 h-5 text-[var(--state-error)] shrink-0 mt-0.5" />,
-    info: <Info className="w-5 h-5 text-[var(--state-info)] shrink-0 mt-0.5" />,
+    success: <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />,
+    alert: <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />,
+    error: <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />,
+    info: <Info className="w-5 h-5 text-sky-600 shrink-0 mt-0.5" />,
   };
 
   const borderStyles: Record<AlertVariant, string> = {
-    success: "border-[var(--state-success)] bg-[var(--state-success-bg)]",
-    alert: "border-[var(--state-alert)] bg-[var(--state-alert-bg)]",
-    error: "border-[var(--state-error)] bg-[var(--state-error-bg)]",
-    info: "border-[var(--state-info)] bg-[var(--state-info-bg)]",
+    success: "border-emerald-200 bg-emerald-50",
+    alert: "border-amber-200 bg-amber-50",
+    error: "border-rose-200 bg-rose-50",
+    info: "border-sky-200 bg-sky-50",
   };
 
   const titleColors: Record<AlertVariant, string> = {
-    success: "text-[var(--state-success)]",
-    alert: "text-[var(--state-alert)]",
-    error: "text-[var(--state-error)]",
-    info: "text-[var(--state-info)]",
+    success: "text-emerald-800",
+    alert: "text-amber-800",
+    error: "text-rose-800",
+    info: "text-sky-800",
   };
 
   return (
@@ -61,7 +61,7 @@ export function Alert({
           {title}
         </h4>
         {description && (
-          <p className="mt-1 text-xs text-[var(--text-primary)] leading-relaxed opacity-90">
+          <p className="mt-1 text-xs text-slate-700 leading-relaxed">
             {description}
           </p>
         )}
@@ -73,7 +73,7 @@ export function Alert({
           type="button"
           onClick={onClose}
           aria-label="Fermer l'alerte"
-          className="p-1 rounded-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] min-touch-target flex items-center justify-center transition-colors"
+          className="p-1 rounded-md text-slate-500 hover:text-slate-900 hover:bg-white min-touch-target flex items-center justify-center transition-colors"
         >
           <X className="w-4 h-4" />
         </button>

@@ -27,26 +27,25 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-150 select-none disabled:opacity-50 disabled:pointer-events-none cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--border-focus)] focus-visible:outline-offset-2";
+      "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-150 select-none disabled:opacity-50 disabled:pointer-events-none cursor-pointer focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:outline-offset-2";
 
     const sizeStyles = {
       sm: "h-9 px-3 text-xs min-w-[36px]",
-      md: "h-11 px-5 text-sm min-touch-target", // 44px min touch target
+      md: "h-11 px-5 text-sm min-touch-target",
       lg: "h-13 px-6 text-base font-semibold min-touch-target",
       icon: "h-11 w-11 p-0 min-touch-target",
     };
 
     const variantStyles = {
-      primary:
-        "gold-gradient-btn text-black shadow-sm active:translate-y-[1px]",
+      primary: "bg-violet-600 text-white shadow-sm hover:bg-violet-700 active:translate-y-[1px]",
       secondary:
-        "bg-[var(--bg-surface-elevated)] text-[var(--text-primary)] border border-[var(--border-app)] hover:border-[var(--gold-primary)] hover:bg-[var(--gold-subtle)] active:translate-y-[1px]",
+        "bg-white text-slate-800 border border-slate-200 hover:border-violet-300 hover:bg-violet-50 active:translate-y-[1px]",
       outline:
-        "bg-transparent text-[var(--gold-primary)] border border-[var(--gold-primary)] hover:bg-[var(--gold-subtle)] hover:border-[var(--gold-hover)] active:translate-y-[1px]",
+        "bg-transparent text-violet-700 border border-violet-600 hover:bg-violet-50 active:translate-y-[1px]",
       danger:
-        "bg-[var(--state-error-bg)] text-[var(--state-error)] border border-[var(--state-error)] hover:bg-[var(--state-error)] hover:text-white active:translate-y-[1px]",
+        "bg-rose-50 text-rose-700 border border-rose-300 hover:bg-rose-600 hover:text-white active:translate-y-[1px]",
       ghost:
-        "bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface-elevated)] active:translate-y-[1px]",
+        "bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 active:translate-y-[1px]",
     };
 
     return (

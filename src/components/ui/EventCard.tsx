@@ -41,28 +41,27 @@ export function EventCard({
   const resolvedCurrency = currency ?? config.currency;
   const resolvedLocale = locale ?? config.locale;
   const badgeColors = {
-    Concert: "bg-purple-600/80 text-purple-100 border border-purple-400/40",
-    Festival: "bg-pink-600/80 text-pink-100 border border-pink-400/40",
-    "VIP Pass": "bg-amber-500/80 text-amber-950 border border-amber-300 font-bold",
-    Sport: "bg-blue-600/80 text-blue-100 border border-blue-400/40",
+    Concert: "bg-violet-50 text-violet-700 border border-violet-200",
+    Festival: "bg-pink-50 text-pink-700 border border-pink-200",
+    "VIP Pass": "bg-amber-50 text-amber-800 border border-amber-200 font-bold",
+    Sport: "bg-sky-50 text-sky-700 border border-sky-200",
   }[category];
 
   return (
-    <div className="neon-card overflow-hidden flex flex-col justify-between group">
-      
+    <div className="neon-card overflow-hidden flex flex-col justify-between group bg-white">
       {/* VIGNETTE IMAGE */}
-      <div className="relative h-44 w-full overflow-hidden bg-[#0A0716]">
+      <div className="relative h-44 w-full overflow-hidden bg-slate-100">
         <Image
           src={imageUrl}
           alt={title}
           fill
           className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#120B24] via-transparent to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/35 via-transparent to-transparent" />
 
         {/* BADGE CATÉGORIE EN HAUT À DROITE */}
         <div className="absolute top-3 right-3 z-10">
-          <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase font-bold tracking-wider backdrop-blur-md shadow-sm ${badgeColors}`}>
+          <span className={`px-2.5 py-1 rounded-full text-[10px] uppercase font-bold tracking-wider ${badgeColors}`}>
             {category}
           </span>
         </div>
@@ -70,46 +69,43 @@ export function EventCard({
 
       {/* CONTENU INFOS */}
       <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-        
         <div className="space-y-1.5">
-          <h4 className="font-heading font-bold text-base text-white group-hover:text-purple-300 transition-colors line-clamp-1">
+          <h4 className="font-heading font-bold text-base text-slate-900 group-hover:text-violet-700 transition-colors line-clamp-1">
             {title}
           </h4>
 
-          <div className="space-y-1 text-xs text-[#A59EBF]">
+          <div className="space-y-1 text-xs text-slate-500">
             <p className="flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+              <Calendar className="w-3.5 h-3.5 text-violet-600 shrink-0" />
               <span>{date}</span>
             </p>
             <p className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-violet-600 shrink-0" />
               <span className="line-clamp-1">{venue}, {city}</span>
             </p>
           </div>
         </div>
 
         {/* PRIX ET BOUTON GET TICKETS */}
-        <div className="pt-3 border-t border-[#251846] flex items-center justify-between gap-3">
+        <div className="pt-3 border-t border-slate-200 flex items-center justify-between gap-3">
           <div>
-            <span className="text-[10px] uppercase text-[#6E6589] font-medium block">
+            <span className="text-[10px] uppercase text-slate-500 font-medium block">
               À partir de
             </span>
-            <span className="font-heading font-black text-lg text-white font-tabular">
+            <span className="font-heading font-black text-lg text-slate-900 font-tabular">
               {formatMoney(toMinor(price, resolvedCurrency, resolvedLocale), resolvedCurrency, resolvedLocale)}
             </span>
           </div>
 
           <button
             onClick={onSelect}
-            className="px-4 py-2 rounded-full border border-purple-500/50 bg-purple-600/20 hover:bg-purple-600 text-purple-200 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+            className="px-4 py-2 rounded-full border border-violet-200 bg-violet-50 hover:bg-violet-600 text-violet-700 hover:text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
           >
             <TicketIcon className="w-3.5 h-3.5" />
             <span>Prendre Billet</span>
           </button>
         </div>
-
       </div>
-
     </div>
   );
 }

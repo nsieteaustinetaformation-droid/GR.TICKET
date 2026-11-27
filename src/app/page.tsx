@@ -4,12 +4,12 @@ import Link from "next/link";
 // avant même le rendu de la page. Ce contenu sert uniquement de secours.
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-[#080412] px-4 text-center text-white">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-white px-4 text-center text-slate-900">
       <h1 className="text-2xl font-black uppercase tracking-tight">GRTK</h1>
-      <p className="mt-2 text-sm text-white/60">Votre espace organisateur vous attend.</p>
+      <p className="mt-2 text-sm text-slate-500">Votre espace organisateur vous attend.</p>
       <Link
         href="/dashboard"
-        className="mt-6 rounded-xl bg-purple-600 px-6 py-3 text-xs font-bold uppercase tracking-wider hover:bg-purple-500"
+        className="mt-6 rounded-xl bg-violet-600 px-6 py-3 text-xs font-bold uppercase tracking-wider text-white shadow-sm hover:bg-violet-700"
       >
         Aller au tableau de bord
       </Link>

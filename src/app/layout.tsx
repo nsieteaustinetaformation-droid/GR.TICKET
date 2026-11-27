@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0A0A0B",
+  themeColor: "#FFFFFF",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -28,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" data-theme="dark" className="h-full">
-      <body className="min-h-full flex flex-col bg-[var(--bg-app)] text-[var(--text-primary)] antialiased selection:bg-[var(--gold-primary)] selection:text-black">
+    <html lang="fr" data-theme="light" className="h-full">
+      <body className="min-h-full flex flex-col bg-[var(--bg-app)] text-[var(--text-primary)] antialiased selection:bg-violet-200 selection:text-violet-900">
         <AuthProvider>
           <SupabaseBootstrap />
           {children}
